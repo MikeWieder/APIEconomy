@@ -79,7 +79,7 @@ public class ProblemBuilder {
 
     public VehicleImpl buildVehicle(Location startLocation) {
         VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
-        return VehicleImpl.Builder.newInstance("vehicle")
+        return VehicleImpl.Builder.newInstance("vehicle").setReturnToDepot(false)
                 .setStartLocation(startLocation).setType(type).build();
     }
 
