@@ -64,7 +64,7 @@ public class ProblemBuilder {
 
         for(PDRoute route : routes) {
 
-            Shipment shipment = Shipment.Builder.newInstance(Integer.toString(j-1)).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
+            Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
                     .setIndex(i).setId(Integer.toString(i)).build())
                     .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(i+1)).build()).build();
 
@@ -89,11 +89,13 @@ public class ProblemBuilder {
         List<PDRoute> routes = getRoutes();
         BaseRouting br = getBr();
 
-        FastVehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = FastVehicleRoutingTransportCostsMatrix.Builder.newInstance(6,false);
+        FastVehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = FastVehicleRoutingTransportCostsMatrix.Builder.newInstance(routes.size()*2,false);
+
+        int i = 0;
 
         for(PDRoute route : routes) {
 
-            int i = 0;
+
 
             TransportationCost tc = br.calcCostForRoute(route.getPickup(),route.getDelivery());
             costMatrixBuilder.addTransportTimeAndDistance(i,i+1, tc.getTime(), tc.getDistance());
@@ -110,6 +112,8 @@ public class ProblemBuilder {
                     if (i == 2) j = 2;
                     else j = i / 2 + 1;
                 }
+
+                if(j == routes.size()) break;
 
                 PDRoute altRoute = routes.get(j);
 
