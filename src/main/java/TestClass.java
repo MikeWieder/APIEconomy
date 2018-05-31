@@ -59,13 +59,13 @@ public class TestClass {
         Collection<VehicleRoutingProblemSolution> solutions = spassMitAlgo.searchSolutions();
         SolutionPrinter.print(vrp,Solutions.bestOf(solutions),SolutionPrinter.Print.VERBOSE);
 
-        BaseRouting br = new BaseRouting("","C:\\Users\\mike-\\OneDrive\\Dokumente\\GraphhoppeOutput");
+        BaseRouting br = new BaseRouting("","C:\\Users\\Mike\\Documents\\GraphhopperResults");
 
-        Place start3 = new Place(48.6921222, 9.1977333, "Flughafen"); // Flughafen
-        Place destination3 = new Place(48.5372796, 9.2846843, "Metzingen"); // Metzingen
+        Place start3 =  new Place(48.6480042, 9.4496037, "KH"); // Kirchheim
+        Place destination3 = new Place(48.6724286, 9.5185991, "SB"); // Schlierbach
 
         TransportationCost tc = br.calcCostForRoute(start3,destination3);
-        System.out.println(tc.getDistance() + tc.getTime());
+        System.out.println("distance: " + tc.getDistance() + "time: " +tc.getTime());
 
         TranslationMap tm = new TranslationMap().doImport();
         Translation tl = tm.getWithFallBack(Locale.GERMANY);
