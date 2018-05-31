@@ -78,7 +78,7 @@ public class ProblemBuilder {
     }
 
     public VehicleImpl buildVehicle(Location startLocation) {
-        VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 5).setCostPerDistance(1).setCostPerTime(2).build();
+        VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
         return VehicleImpl.Builder.newInstance("vehicle")
                 .setStartLocation(startLocation).setType(type).build();
     }
@@ -122,7 +122,7 @@ public class ProblemBuilder {
                 //costMatrixBuilder.addTransportTime(i+1,2*j, tc.getTime());
 
                 tc = br.calcCostForRoute(altRoute.getDelivery(),route.getPickup());
-                costMatrixBuilder.addTransportTimeAndDistance(2*j,i+1, tc.getTime(), tc.getDistance());
+                costMatrixBuilder.addTransportTimeAndDistance(2*j+1,i, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j,i+1, tc.getTime());
 
 
@@ -149,7 +149,7 @@ public class ProblemBuilder {
                 //costMatrixBuilder.addTransportTime(i,2*j+1, tc.getTime());
 
                 tc = br.calcCostForRoute(altRoute.getPickup(),route.getDelivery());
-                costMatrixBuilder.addTransportDistance(2*j+1,i, tc.getDistance());
+                costMatrixBuilder.addTransportTimeAndDistance(2*j,i+1, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j+1,i, tc.getTime());
             }
             i +=2;
