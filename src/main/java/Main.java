@@ -58,6 +58,7 @@ public class Main {
         SolutionPrinter.print(problem,solution,SolutionPrinter.Print.VERBOSE);
         FastVehicleRoutingTransportCostsMatrix costsMatrix = (FastVehicleRoutingTransportCostsMatrix) problem.getTransportCosts();
         Map<String, Job> jobs = problem.getJobs();
+
         for(VehicleRoute vr : solution.getRoutes()) {
             int distance = 0;
             int time = 0;
@@ -92,6 +93,9 @@ public class Main {
                 startIndex = ta.getIndex();
             }
             System.out.println("Total distance of the route in km: " + distance);
+            JSONBuilder jsonBuilder = new JSONBuilder();
+            String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distance);
+            System.out.println(jsonString);
         }
 
     }
