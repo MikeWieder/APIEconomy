@@ -15,4 +15,10 @@ public class PDRoute {
     public Place getPickup() {
         return pickup;
     }
+
+    @Override
+    public String toString() {
+        return pickup.toString() + " nach " + delivery.toString();
+    }
+
 }

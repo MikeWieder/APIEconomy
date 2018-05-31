@@ -61,8 +61,8 @@ public class TestClass {
 
         BaseRouting br = new BaseRouting("","C:\\Users\\mike-\\OneDrive\\Dokumente\\GraphhoppeOutput");
 
-        Place start3 = new Place(48.6921222, 9.1977333); // Flughafen
-        Place destination3 = new Place(48.5372796, 9.2846843); // Metzingen
+        Place start3 = new Place(48.6921222, 9.1977333, "Flughafen"); // Flughafen
+        Place destination3 = new Place(48.5372796, 9.2846843, "Metzingen"); // Metzingen
 
         TransportationCost tc = br.calcCostForRoute(start3,destination3);
         System.out.println(tc.getDistance() + tc.getTime());
