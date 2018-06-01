@@ -6,12 +6,24 @@ import com.graphhopper.jsprit.core.util.Solutions;
 
 import java.util.Collection;
 
+/**
+ *
+ * Klasse, welche die eigentliche Optimierung des Pickup and Delivery Problems durchführt
+ *
+ */
 public class PDOptmizer {
 
     public PDOptmizer() {
 
     }
 
+    /**
+     *
+     * Verwendet aktuell einen einfachen (Standart) Algorithmus.
+     *
+     * @param problem Das zu optimierende Problem
+     * @return Die Lösung(optimale Route) des übergebenen Problems
+     */
     public VehicleRoutingProblemSolution buildSolution(VehicleRoutingProblem problem) {
         VehicleRoutingAlgorithm spassMitAlgo = Jsprit.createAlgorithm(problem);
         Collection<VehicleRoutingProblemSolution> solutions = spassMitAlgo.searchSolutions();

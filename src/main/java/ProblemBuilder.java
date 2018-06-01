@@ -16,6 +16,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+
+/**
+ * Klasse zum zusammenbauen des VehicleRoutingProblem
+ * <br> bestehend aus den einzelnen Jobs(bzw. Shipments, also den Einzelrouten),
+ * <br> den zur Verfügung stehenden Fahrzeugen und der CostMatrix.
+ */
 public class ProblemBuilder {
 
     private BaseRouting br;
@@ -27,6 +33,14 @@ public class ProblemBuilder {
     }
 
 
+    /**
+     * Zentrale Methode der Klasse zum erzeugen des VehicleRoutingProblems.
+     * <br> Das Problem basiert auf der im Konstrukter übergebenen Liste an Routen
+     * <br> (Sollte evtl. noch geändert werden, außerdem sollten die Fahrzeuge zusätzlich übergeben
+     * <br> und nicht wie aktuell statisch erzeugt werden.
+     *
+     * @return Das erzeugte VehicleRoutingProblem
+     */
     public VehicleRoutingProblem buildProblem() {
 
         VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance();
@@ -42,8 +56,8 @@ public class ProblemBuilder {
             break;
         }
 
-        builder.addVehicle(buildVehicle(startLocation, "vehicle1"));
-        builder.addVehicle(buildVehicle(startLocation, "vehicle2"));
+        builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
+        builder.addVehicle(buildVehicle(startLocation, "vehicle2", 4, false));
 
         Random random = new Random();
 
@@ -56,13 +70,21 @@ public class ProblemBuilder {
         return vrp;
     }
 
-    public Collection<Shipment> createShipments() {
+    /**
+     *
+     * Erstellt basierend auf der im Konstruktor übergebenen Liste an Routen die dazugehörigen
+     * <br> Shipments. Jedes Shipment besitzt 2 Locations (Pickup + Delivery) welche mit einem Index und einer ID
+     * <br> markiert werden. Diese werden entsprechend der Routen hochgezählt.
+     * <br> Pickup-Route0 -> Index/ID 0; Delivery-Route0 -> Index/ID 1; Pickup-Route1 -> Index/ID 2 ...
+     *
+     * @return Liste, welche alle erzeugten Shipments beinhaltet.
+     */
+    private Collection<Shipment> createShipments() {
 
         List<Shipment> shipments = new ArrayList<>();
         List<PDRoute> routes = getRoutes();
 
         int i = 0;
-        int j = 1;
 
         for(PDRoute route : routes) {
 
@@ -74,21 +96,37 @@ public class ProblemBuilder {
             shipments.add(shipment);
             TimeWindow tw = new TimeWindow(0,20);
 
-            j++;
             i += 2;
         }
 
         return shipments;
     }
 
-    public VehicleImpl buildVehicle(Location startLocation, String name) {
+    /**
+     *
+     * @param startLocation Der Ort, an dem sich das Fahrzeug zu Beginn befindet. Die Location muss in der CostMatrix vorhanden sein,
+     *                      <br> da sonst der erste Schritt nicht berechnet werden kann.
+     * @param name Entspricht einfach dem Namen des Fahrzeugs(ähnlich ID?)
+     * @param capacity Kapazität des Fahrzeugs
+     * @param returnToStart Bei true fährt das Fahrzeug nach dem abschließen des letzten Shipments zu seiner Startposition zurück.
+     * @return Liefert das erzeugte Fahrzeug zurück, welches dem Problem hinzugefügt werden kann.
+     */
+    private VehicleImpl buildVehicle(Location startLocation, String name, int capacity, boolean returnToStart) {
         VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
         return VehicleImpl.Builder.newInstance(name).setReturnToDepot(false)
                 .setStartLocation(startLocation).setType(type).build();
     }
 
 
-    public FastVehicleRoutingTransportCostsMatrix buildCostMatrix() {
+    /**
+     *
+     * Baut die CostMatrix basierend auf den Routeliste auf.
+     * <br> Zum berechnen der Distanzen und Zeiten wird die Klasse BaseRouting verwendet.
+     * <br> Die erzeugte Matrix ist nicht symmetrisch, also A->B entspricht nicht B->A
+     *
+     * @return Die Matrix, welche sämtliche Distanzen und Zeiten zwischen allen Punkten beinhaltet.
+     */
+    private FastVehicleRoutingTransportCostsMatrix buildCostMatrix() {
 
         List<PDRoute> routes = getRoutes();
         BaseRouting br = getBr();

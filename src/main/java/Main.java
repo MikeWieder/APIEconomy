@@ -24,6 +24,8 @@ public class Main {
 
         List<PDRoute> routes = new ArrayList<>();
 
+        // Hier werden die Routenpunkte(Pickups+Deliveries angelegt), sollte aus dem Input-JSON ausgelesen und damit erzeugt werden.
+
         Place start1 =  new Place(48.6480042, 9.4496037, "KH"); // Kirchheim
         Place destination1 = new Place(48.4791793,9.186754, "RT"); // Hochschule Reutlingen
         routes.add(new PDRoute(start1, destination1));
