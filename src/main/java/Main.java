@@ -48,7 +48,7 @@ public class Main {
         Place destination6 = new Place(48.8221525, 9.3343294, "WB"); // Waiblingen
         routes.add(new PDRoute(start6, destination6));
 
-        BaseRouting br = new BaseRouting("", "C:\\Users\\Mike\\Documents\\GraphhopperResults");
+        BaseRouting br = new BaseRouting("", "C:\\Users\\mike-\\OneDrive\\Dokumente\\GraphhoppeOutput");
         //Test: System.out.println(br.calcCostForRoute(start1,start6).getDistance());
 
         PDOptmizer opti = new PDOptmizer();
@@ -92,6 +92,7 @@ public class Main {
 
                 startIndex = ta.getIndex();
             }
+            // TODO: 01.06.2018  duplicated locations in json
             System.out.println("Total distance of the route in km: " + distance);
             JSONBuilder jsonBuilder = new JSONBuilder();
             String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distance);

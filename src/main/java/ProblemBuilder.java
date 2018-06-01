@@ -3,6 +3,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
@@ -41,7 +42,8 @@ public class ProblemBuilder {
             break;
         }
 
-        builder.addVehicle(buildVehicle(startLocation));
+        builder.addVehicle(buildVehicle(startLocation, "vehicle1"));
+        builder.addVehicle(buildVehicle(startLocation, "vehicle2"));
 
         Random random = new Random();
 
@@ -64,11 +66,13 @@ public class ProblemBuilder {
 
         for(PDRoute route : routes) {
 
+            //TimeWindow tw = new TimeWindow(0,20);
             Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
                     .setIndex(i).setId(Integer.toString(i)).build())
                     .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(i+1)).build()).build();
 
             shipments.add(shipment);
+            TimeWindow tw = new TimeWindow(0,20);
 
             j++;
             i += 2;
@@ -77,9 +81,9 @@ public class ProblemBuilder {
         return shipments;
     }
 
-    public VehicleImpl buildVehicle(Location startLocation) {
+    public VehicleImpl buildVehicle(Location startLocation, String name) {
         VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
-        return VehicleImpl.Builder.newInstance("vehicle").setReturnToDepot(false)
+        return VehicleImpl.Builder.newInstance(name).setReturnToDepot(false)
                 .setStartLocation(startLocation).setType(type).build();
     }
 
