@@ -53,9 +53,7 @@ public class BaseRouting {
     }
 
     /**
-     *
      * Routenanfrage wird auf Basis des Start- und Zielpunkts erzeugt.
-     *
      * @param start Place-Objekt des Startpunkts
      * @param destination Place-Objekt des Zielpunkts
      * @return Erzeugter Graphhopper-Request

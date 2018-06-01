@@ -75,7 +75,7 @@ public class ProblemBuilder {
      * Erstellt basierend auf der im Konstruktor übergebenen Liste an Routen die dazugehörigen
      * <br> Shipments. Jedes Shipment besitzt 2 Locations (Pickup + Delivery) welche mit einem Index und einer ID
      * <br> markiert werden. Diese werden entsprechend der Routen hochgezählt.
-     * <br> Pickup-Route0 -> Index/ID 0; Delivery-Route0 -> Index/ID 1; Pickup-Route1 -> Index/ID 2 ...
+     * <br> Pickup-Route0 hat Index/ID 0; Delivery-Route0 hat Index/ID 1; Pickup-Route1 hat Index/ID 2 ...
      *
      * @return Liste, welche alle erzeugten Shipments beinhaltet.
      */
@@ -122,7 +122,7 @@ public class ProblemBuilder {
      *
      * Baut die CostMatrix basierend auf den Routeliste auf.
      * <br> Zum berechnen der Distanzen und Zeiten wird die Klasse BaseRouting verwendet.
-     * <br> Die erzeugte Matrix ist nicht symmetrisch, also A->B entspricht nicht B->A
+     * <br> Die erzeugte Matrix ist nicht symmetrisch, also A zu B entspricht nicht B zu A
      *
      * @return Die Matrix, welche sämtliche Distanzen und Zeiten zwischen allen Punkten beinhaltet.
      */
