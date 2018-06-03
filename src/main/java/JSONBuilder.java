@@ -6,12 +6,26 @@ import org.json.JSONArray;
 
 import java.util.List;
 
+
+/**
+ * Klasse zum Erzeugen von JSON-Strings
+ */
 public class JSONBuilder {
 
     public JSONBuilder() {
 
     }
 
+    /**
+     *
+     * Erzeugt ein JSON mit allen relevanten Informationen zu der Lösung
+     * <br> noch NICHT fertig, fehlerhaft bei mehreren Fahrzeugen
+     *
+     * @param solution Lösung zum Pickup and Delivery Problem
+     * @param routes Sämtliche "Grundrouten", also Liste an Pickups und dazugehörigen Deliveries.
+     * @param totalDistance Gesamte Distanz der Route
+     * @return String, welcher das erzeugte JSON beinhaltet
+     */
     public String buildSolutionJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, int totalDistance) {
 
 

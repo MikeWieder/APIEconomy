@@ -1,5 +1,12 @@
 import com.graphhopper.util.InstructionList;
 
+
+/**
+ *
+ * Klasse zum verwalten von Zeiten und Distanzen einer Route.
+ * <br> Beinhaltet außerdem die Liste an Instruktion für eine Route
+ *
+ */
 public class TransportationCost {
 
     private int time;
