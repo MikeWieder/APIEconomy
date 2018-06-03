@@ -5,17 +5,20 @@ public class Place {
     private double lat;
     private double lon;
     private String locName;
+    private int locID;
 
     /**
      *
      * @param lat latitude des Ortes
      * @param lon longitude des Ortes
      * @param locName Name des ortes
+     * @param locID ID des Ortes
      */
-    public Place(double lat, double lon, String locName) {
+    public Place(double lat, double lon, String locName, int locID) {
         this.lat = lat;
         this.lon = lon;
         this.locName = locName;
+        this.locID = locID;
     }
 
     public double getLat() {
@@ -24,6 +27,14 @@ public class Place {
 
     public double getLon() {
         return lon;
+    }
+
+    public int getLocID() {
+        return locID;
+    }
+
+    public String getLocName() {
+        return locName;
     }
 
     public String toString() {

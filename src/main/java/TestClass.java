@@ -61,8 +61,8 @@ public class TestClass {
 
         BaseRouting br = new BaseRouting("","C:\\Users\\Mike\\Documents\\GraphhopperResults");
 
-        Place start3 =  new Place(48.6480042, 9.4496037, "KH"); // Kirchheim
-        Place destination3 = new Place(48.6724286, 9.5185991, "SB"); // Schlierbach
+        Place start3 =  new Place(48.6480042, 9.4496037, "KH", 0); // Kirchheim
+        Place destination3 = new Place(48.6724286, 9.5185991, "SB",1); // Schlierbach
 
         TransportationCost tc = br.calcCostForRoute(start3,destination3);
         System.out.println("distance: " + tc.getDistance() + "time: " +tc.getTime());

@@ -3,9 +3,10 @@
  */
 public class VehicleDefinition {
 
-    private String id;
+    private int id;
     private int capacity;
     private Place startLocation;
+    private String name;
 
     /**
      *
@@ -13,13 +14,14 @@ public class VehicleDefinition {
      * @param capacity Kapazität des Fahrzeugs
      * @param startLocation Startpunkt des Fahrzeugs, muss in der CostMatrix enthalten sein.
      */
-    public VehicleDefinition(String id, int capacity, Place startLocation) {
+    public VehicleDefinition(int id, int capacity, Place startLocation, String name) {
         this.capacity = capacity;
         this.id = id;
         this.startLocation = startLocation;
+        this.name = name;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -29,5 +31,9 @@ public class VehicleDefinition {
 
     public Place getStartLocation() {
         return startLocation;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -26,10 +26,18 @@ public class ProblemBuilder {
 
     private BaseRouting br;
     private List<PDRoute> routes;
+    private List<VehicleDefinition> vehicles;
 
-    public ProblemBuilder(BaseRouting br, List<PDRoute> routes) {
+    /**
+     *
+     * @param br BaseRouting-Objekt zum Durchführen der einzelnen Routenberechnungen
+     * @param routes Liste mit allen Routen (Pickups+Deliveries)
+     * @param vehicles Liste mit den zur Verfuegung stehenden Fahrzeugen
+     */
+    public ProblemBuilder(BaseRouting br, List<PDRoute> routes, List<VehicleDefinition> vehicles) {
         this.br = br;
         this.routes = routes;
+        this.vehicles = vehicles;
     }
 
 
@@ -46,6 +54,8 @@ public class ProblemBuilder {
         VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance();
         builder.setFleetSize(VehicleRoutingProblem.FleetSize.FINITE).setRoutingCost(buildCostMatrix());
 
+
+
         Collection<Shipment> shipments = createShipments();
         builder.addAllJobs(shipments);
 
@@ -55,9 +65,22 @@ public class ProblemBuilder {
             startLocation = shipment.getPickupLocation();
             break;
         }
+        List<VehicleDefinition> vehicles = getVehicles();
 
-        builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
-        builder.addVehicle(buildVehicle(startLocation, "vehicle2", 4, false));
+        for(VehicleDefinition vehicle : vehicles) {
+            //startLocation = Location.Builder.newInstance().setId(vehicle.getName()).setIndex(vehicle.getId()).build();
+            for(Shipment shipment : shipments) {
+                System.out.println(shipment.getPickupLocation().getId());
+                System.out.println(vehicle.getStartLocation().getLocID());
+                if(Integer.parseInt(shipment.getPickupLocation().getId()) == vehicle.getStartLocation().getLocID() || shipment.getDeliveryLocation().getIndex() == vehicle.getStartLocation().getLocID() ) {
+                    startLocation = shipment.getPickupLocation();
+                }
+            }
+            System.out.println(vehicle.getName());
+            builder.addVehicle(buildVehicle(startLocation, vehicle.getName(), vehicle.getCapacity(),false));
+        }
+        //builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
+        //builder.addVehicle(buildVehicle(startLocation, "vehicle2", 4, false));
 
         Random random = new Random();
 
@@ -90,8 +113,8 @@ public class ProblemBuilder {
 
             //TimeWindow tw = new TimeWindow(0,20);
             Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
-                    .setIndex(i).setId(Integer.toString(i)).build())
-                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(i+1)).build()).build();
+                    .setIndex(i).setId(Integer.toString(route.getPickup().getLocID())).build())
+                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(route.getDelivery().getLocID())).build()).build();
 
             shipments.add(shipment);
             TimeWindow tw = new TimeWindow(0,20);
@@ -113,7 +136,7 @@ public class ProblemBuilder {
      */
     private VehicleImpl buildVehicle(Location startLocation, String name, int capacity, boolean returnToStart) {
         VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
-        return VehicleImpl.Builder.newInstance(name).setReturnToDepot(false)
+        return VehicleImpl.Builder.newInstance(name).setReturnToDepot(returnToStart)
                 .setStartLocation(startLocation).setType(type).build();
     }
 
@@ -128,6 +151,7 @@ public class ProblemBuilder {
      */
     private FastVehicleRoutingTransportCostsMatrix buildCostMatrix() {
 
+        // TODO: 03.06.2018  Change the indices in the cost Matrix to the IDs of the Place objects
         List<PDRoute> routes = getRoutes();
         BaseRouting br = getBr();
 
@@ -221,4 +245,6 @@ public class ProblemBuilder {
     public BaseRouting getBr() {
         return br;
     }
+
+    public List<VehicleDefinition> getVehicles() { return vehicles; }
 }
