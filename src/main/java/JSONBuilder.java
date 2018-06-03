@@ -23,10 +23,10 @@ public class JSONBuilder {
      *
      * @param solution Lösung zum Pickup and Delivery Problem
      * @param routes Sämtliche "Grundrouten", also Liste an Pickups und dazugehörigen Deliveries.
-     * @param totalDistance Gesamte Distanz der Route
+     * @param distances Gesamte Distanz der einzelnen Routen
      * @return String, welcher das erzeugte JSON beinhaltet
      */
-    public String buildSolutionJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, int totalDistance) {
+    public String buildSolutionJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, int[] distances) {
 
 
         Double totalTime = 0.;
@@ -35,6 +35,7 @@ public class JSONBuilder {
         int routeCount = 0;
 
         for(VehicleRoute vr : solution.getRoutes()){
+            totalTime = 0.;
             JSONObject routeObject = new JSONObject();
             JSONArray steps = new JSONArray();
             JSONObject step = new JSONObject();
@@ -60,7 +61,7 @@ public class JSONBuilder {
                 stepCount++;
             }
 
-            routeObject.put("totalTime",totalTime).put("totalDistance",totalDistance);
+            routeObject.put("totalTime",totalTime).put("totalDistance",distances[routeCount]);
             routeObject.put("steps",steps);
             array.put(routeCount, routeObject);
 

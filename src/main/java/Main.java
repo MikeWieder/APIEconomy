@@ -70,6 +70,9 @@ public class Main {
         FastVehicleRoutingTransportCostsMatrix costsMatrix = (FastVehicleRoutingTransportCostsMatrix) problem.getTransportCosts();
         Map<String, Job> jobs = problem.getJobs();
 
+        int totalDistance = 0;
+        int[] distances = new int[solution.getRoutes().size()];
+        int count = 0;
         for(VehicleRoute vr : solution.getRoutes()) {
             int distance = 0;
             int time = 0;
@@ -88,6 +91,7 @@ public class Main {
                 }
                 distance += costsMatrix.getDistance(startIndex-1,ta.getIndex()-1);
 
+
                 //System.out.println("distance: " + costsMatrix.getDistance(startIndex-1,ta.getIndex()-1) + " start: " + (startIndex-1) + " dest: " + (ta.getIndex()-1));
 
 
@@ -105,11 +109,15 @@ public class Main {
             }
             // TODO: 01.06.2018  duplicated locations in json
             System.out.println("Total distance of the route in km: " + distance);
-            JSONBuilder jsonBuilder = new JSONBuilder();
-            String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distance);
-            System.out.println(jsonString);
-        }
+            distances[count] = distance;
+            totalDistance += distance;
 
+            count++;
+
+        }
+        JSONBuilder jsonBuilder = new JSONBuilder();
+        String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distances);
+        System.out.println(jsonString);
     }
 
 }
