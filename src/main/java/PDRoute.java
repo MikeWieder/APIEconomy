@@ -12,6 +12,7 @@ public class PDRoute {
      * @param delivery Place-Objekt der Delivery-Location
      */
     public PDRoute(Place pickup, Place delivery) {
+        // TODO: (04.06.2018, MFO) integrate P/D-capacity; here or in class Place...?
         this.delivery = delivery;
         this.pickup = pickup;
     }

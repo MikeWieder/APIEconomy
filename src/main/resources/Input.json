@@ -1,0 +1,13 @@
+
+
+{"vehicles":[
+  { "id":"vehicleID1", "location-coord": {"x" : "48.6921222", "y" : "9.1977333"}, "capacity" : "4" },
+  { "id":"vehicleID2", "location-coord": {"x" : "48.5372796", "y" : "9.2846843"}, "capacity" : "4" }
+],
+
+  "services":[
+    {"jobid" : "jobID1", "pickup" : {"x" : "55.5", "y" : "10.0"}, "delivery": {"x" : "23.68", "y" : "5.05"}, "capacity" : "1" },
+    {"jobid" : "jobID2", "pickup" : {"x" : "40.56", "y" : "15.06"}, "delivery": {"x" : "23.78", "y" : "8.78"}, "capacity" : "1" },
+    {"jobid" : "jobID3", "pickup" : {"x" : "45.56", "y" : "15.64"}, "delivery": {"x" : "55.77", "y" : "20.78"}, "capacity" : "1" }
+  ]
+}
