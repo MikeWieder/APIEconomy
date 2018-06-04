@@ -1,9 +1,9 @@
+import com.graphhopper.util.shapes.GHPlace;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +37,14 @@ public class JSONReader {
         }
     }
 
+    public List<PDRoute> getPdRouteList() {
+        return pdRouteList;
+    }
+
+    public List<VehicleDefinition> getVehicleDefinitionList() {
+        return vehicleDefinitionList;
+    }
+
     private void generatePDRouteList(JSONObject inputObject) {
 
         JSONArray services = (JSONArray) inputObject.get("services");
@@ -50,14 +58,22 @@ public class JSONReader {
             JSONObject pickupLocation = (JSONObject) serviceObjects.get("pickup");
             double lat = Double.parseDouble( (String) pickupLocation.get("x"));
             double lon = Double.parseDouble( (String) pickupLocation.get("y"));
-            String locName = (String) serviceObjects.get("jobid");
+            String locName = (String) serviceObjects.get("pickup-name_city");
 
             pickup = new Place(lat, lon, locName, placeID);
 
+            JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
+            lat = Double.parseDouble( (String) pickupLocation.get("x"));
+            lon = Double.parseDouble( (String) pickupLocation.get("y"));
+            locName = (String) serviceObjects.get("delivery-name_city");
+
+            delivery = new Place(lat, lon, locName, placeID);
+
+            String jobID = (String) serviceObjects.get("jobID");
             int capacity = Integer.parseInt( (String) serviceObjects.get("capacity"));
 
             // generate PDRoute object with Places "pickup" & "delivery"
-            pdRoute = new PDRoute(pickup, delivery);
+            pdRoute = new PDRoute(jobID, pickup, delivery, capacity);
             System.out.println("Generated PDRoute object.");
 
             pdRouteList.add(pdRoute);
@@ -82,14 +98,14 @@ public class JSONReader {
             JSONObject vehicleLocation = (JSONObject) vehicleObjects.get("location-coord");
             double lat = Double.parseDouble( (String) vehicleLocation.get("x"));
             double lon = Double.parseDouble( (String) vehicleLocation.get("y"));
-            String locName = "Start location of "+vehicleName;
+            String locName = (String) vehicleObjects.get("loc-name_city");
             startLocation = new Place(lat, lon, locName, vehicleLocID);
 
             System.out.println("TEST PRINT");
             System.out.println(vehicleID +" "+ capacity +" "+ startLocation.getLocName()
                     +" "+ startLocation.getLat() +" "+ startLocation.getLon());
 
-            vehicleDefinition = new VehicleDefinition(vehicleID, capacity, startLocation, vehicleName);
+            vehicleDefinition = new VehicleDefinition(vehicleName, capacity, startLocation);
             System.out.println("Generated vehicledefiniton object with ID "+vehicleID);
 
             vehicleDefinitionList.add(vehicleDefinition);
@@ -98,6 +114,4 @@ public class JSONReader {
             vehicleLocID++;
         }
     }
-
-
 }
