@@ -47,7 +47,7 @@ public class PDRoute implements Comparable<PDRoute> {
 
     @Override
     public String toString() {
-        return pickup.toString() + " nach " + delivery.toString();
+        return pickup.toString().substring(0,3) + " nach " + delivery.toString().substring(0,3);
     }
 
     @Override

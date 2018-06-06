@@ -6,16 +6,16 @@ public class VehicleDefinition {
     private int id;
     private int capacity;
     private Place startLocation;
-    private String name;
+    private String uniqueName;
 
     /**
      *
-     * @param name ID bzw. Name des zu erzeugenden Fahrzeugs; von Client vorgegeben
+     * @param uniqueName ID bzw. Name des zu erzeugenden Fahrzeugs; von Client vorgegeben
      * @param capacity Kapazität des Fahrzeugs
      * @param startLocation Startpunkt des Fahrzeugs, muss in der CostMatrix enthalten sein.
      */
-    public VehicleDefinition(String name, int capacity, Place startLocation) {
-        this.name = name;
+    public VehicleDefinition(String uniqueName, int capacity, Place startLocation) {
+        this.uniqueName = uniqueName;
         this.capacity = capacity;
         this.startLocation = startLocation;
     }
@@ -29,11 +29,11 @@ public class VehicleDefinition {
     }
 
     public String getName() {
-        return name;
+        return uniqueName;
     }
 
     @Override
     public String toString (){
-        return "Fahrzeug "+ name + " geparkt in " + startLocation.toString();
+        return "Fahrzeug "+ uniqueName + " geparkt in " + startLocation.toString();
     }
 }

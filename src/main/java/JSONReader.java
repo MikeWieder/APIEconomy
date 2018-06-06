@@ -1,4 +1,3 @@
-import com.graphhopper.util.shapes.GHPlace;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,7 +23,7 @@ public class JSONReader {
             try {
                 // read + parse file and convert to JSONObject
                 JSONObject inputObject = (JSONObject) parser.parse(
-                        new FileReader("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\Input.json"));
+                        new FileReader("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\input_v2.json"));
 
                 //method to generate a List of PDRoute objects
                 //returns integer placeID to pass its value to the Vehicle List
@@ -58,25 +57,31 @@ public class JSONReader {
 
             JSONObject serviceObjects = (JSONObject) o;
 
-            //read coordinates of pickup location; initialize Place objects
+            String jobID = (String) serviceObjects.get("jobID");
+            int capacity = (int) (long) serviceObjects.get("capacity");
+
+            //read coordinates and adress data of pickup location; initialize Place objects
             JSONObject pickupLocation = (JSONObject) serviceObjects.get("pickup");
-            double lat = Double.parseDouble( (String) pickupLocation.get("x"));
-            double lon = Double.parseDouble( (String) pickupLocation.get("y"));
-            String locName = (String) serviceObjects.get("pickup-name_city");
+            double lat = (Double) pickupLocation.get("lat");
+            double lon = (Double) pickupLocation.get("lon");
+            String city = (String) pickupLocation.get("city");
+            //TODO (060618, MFO) add street. houseNo, zip
+            //+ street
+            //+ houseNo
+            //+ zip
+            pickup = new Place(lat, lon, city, placeID);
 
-            pickup = new Place(lat, lon, locName, placeID);
-
-            //read coordinates of pickup location; initialize Place object with placeID + 1
+            //read coordinates and adress data of delivery location; initialize Place object with placeID + 1
             placeID++;
             JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
-            lat = Double.parseDouble( (String) pickupLocation.get("x"));
-            lon = Double.parseDouble( (String) pickupLocation.get("y"));
-            locName = (String) serviceObjects.get("delivery-name_city");
-
-            delivery = new Place(lat, lon, locName, placeID);
-
-            String jobID = (String) serviceObjects.get("jobID");
-            int capacity = Integer.parseInt( (String) serviceObjects.get("capacity"));
+            lat = (Double) deliveryLocation.get("lat");
+            lon = (Double) deliveryLocation.get("lon");
+            city = (String) deliveryLocation.get("city");
+            //TODO (060618, MFO) add street. houseNo, zip
+            //+ street
+            //+ houseNo
+            //+ zip
+            delivery = new Place(lat, lon, city, placeID);
 
             // generate PDRoute object with Places "pickup" & "delivery"
             pdRoute = new PDRoute(jobID, pickup, delivery, capacity);
@@ -98,21 +103,25 @@ public class JSONReader {
 
             JSONObject vehicleObjects = (JSONObject) o;
 
-            int capacity = Integer.parseInt( (String) vehicleObjects.get("capacity"));
-            String vehicleName = (String) vehicleObjects.get("id");
+            String uniqueName = (String) vehicleObjects.get("id");
+            int capacity = (int) (long) vehicleObjects.get("capacity");
 
-            JSONObject vehicleLocation = (JSONObject) vehicleObjects.get("location-coord");
-            double lat = Double.parseDouble( (String) vehicleLocation.get("x"));
-            double lon = Double.parseDouble( (String) vehicleLocation.get("y"));
-            String locName = (String) vehicleObjects.get("loc-name_city");
-            startLocation = new Place(lat, lon, locName, placeID);
+            JSONObject vehicleLocation = (JSONObject) vehicleObjects.get("startlocation");
+            double lat = (Double) vehicleLocation.get("lat");
+            double lon = (Double) vehicleLocation.get("lon");
+            String city = (String) vehicleLocation.get("city");
+            //TODO (060618, MFO) add street. houseNo, zip
+            //+ street
+            //+ houseNo
+            //+ zip
+            startLocation = new Place(lat, lon, city, placeID);
 
             System.out.println("TEST PRINT");
-            System.out.println(vehicleID +" "+ capacity +" "+ startLocation.getLocName()
+            System.out.println(vehicleID +" "+ capacity +" "+ startLocation.getCity()
                     +" "+ startLocation.getLat() +" "+ startLocation.getLon());
 
-            vehicleDefinition = new VehicleDefinition(vehicleName, capacity, startLocation);
-            System.out.println("Generated vehicledefiniton object with ID "+vehicleID);
+            vehicleDefinition = new VehicleDefinition(uniqueName, capacity, startLocation);
+            System.out.println("Generated VehicleDefiniton object with ID "+vehicleID);
 
             vehicleDefinitionList.add(vehicleDefinition);
             System.out.println("Elements within VehicleDefinitionList: "+vehicleDefinitionList.size());
