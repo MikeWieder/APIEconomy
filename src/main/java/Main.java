@@ -63,7 +63,7 @@ public class Main {
         vehicles.add(vehicle2);
 
 
-        BaseRouting br = new BaseRouting("", "D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\results");
+        BaseRouting br = new BaseRouting("", "src/main/resources/results");
         //Test: System.out.println(br.calcCostForRoute(start1,start6).getDistance());
 
         PDOptmizer opti = new PDOptmizer();

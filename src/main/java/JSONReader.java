@@ -23,7 +23,7 @@ public class JSONReader {
             try {
                 // read + parse file and convert to JSONObject
                 JSONObject inputObject = (JSONObject) parser.parse(
-                        new FileReader("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\input_v2.json"));
+                        new FileReader("src/main/resources/input_v2.json"));
 
                 //method to generate a List of PDRoute objects
                 //returns integer placeID to pass its value to the Vehicle List

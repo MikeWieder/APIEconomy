@@ -86,10 +86,11 @@ public class JSONBuilder {
             routeObject.put("totalTime",totalTime).put("totalDistance",distances[routeCount]);
             routeObject.put("steps",steps);
             array.put(routeCount, routeObject);
-
+            System.out.println(stepCount + "-------------------------------------------------------");
             routeCount++;
 
         }
+        System.out.println(routeCount);
         return array.toString();
     }
 
