@@ -10,11 +10,9 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.FastVehicleRoutingTransportCostsMatrix;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
+import com.graphhopper.util.InstructionList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 /**
@@ -27,6 +25,7 @@ public class ProblemBuilder {
     private BaseRouting br;
     private List<PDRoute> routes;
     private List<VehicleDefinition> vehicles;
+    private Map<PDRoute,InstructionList> routeInstructionsMap;
 
     /**
      *
@@ -61,22 +60,18 @@ public class ProblemBuilder {
 
         Location startLocation = null;
 
-        for(Shipment shipment : shipments) {
-            startLocation = shipment.getPickupLocation();
-            break;
-        }
         List<VehicleDefinition> vehicles = getVehicles();
 
         for(VehicleDefinition vehicle : vehicles) {
             //startLocation = Location.Builder.newInstance().setId(vehicle.getName()).setIndex(vehicle.getId()).build();
             for(Shipment shipment : shipments) {
-                System.out.println(shipment.getPickupLocation().getId());
-                System.out.println(vehicle.getStartLocation().getLocID());
+//                System.out.println(shipment.getPickupLocation().getId());
+//                System.out.println(vehicle.getStartLocation().getLocID());
                 if(Integer.parseInt(shipment.getPickupLocation().getId()) == vehicle.getStartLocation().getLocID() || shipment.getDeliveryLocation().getIndex() == vehicle.getStartLocation().getLocID() ) {
                     startLocation = shipment.getPickupLocation();
                 }
             }
-            System.out.println(vehicle.getName());
+//            System.out.println(vehicle.getName());
             builder.addVehicle(buildVehicle(startLocation, vehicle.getName(), vehicle.getCapacity(),false));
         }
         //builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
@@ -114,7 +109,7 @@ public class ProblemBuilder {
             //TimeWindow tw = new TimeWindow(0,20);
             Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
                     .setIndex(i).setId(Integer.toString(route.getPickup().getLocID())).build())
-                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(route.getDelivery().getLocID())).build()).build();
+                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(route.getDelivery().getLocID())).build()).setName(route.getJobName()).build();
 
             shipments.add(shipment);
             TimeWindow tw = new TimeWindow(0,20);
@@ -153,11 +148,14 @@ public class ProblemBuilder {
 
         // TODO: 03.06.2018  Change the indices in the cost Matrix to the IDs of the Place objects
         List<PDRoute> routes = getRoutes();
+        Map<PDRoute,InstructionList> routeInstructions = new TreeMap<>();
         BaseRouting br = getBr();
 
         FastVehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = FastVehicleRoutingTransportCostsMatrix.Builder.newInstance(routes.size()*2,false);
 
         int i = 0;
+
+
 
         for(PDRoute route : routes) {
 
@@ -166,10 +164,12 @@ public class ProblemBuilder {
             TransportationCost tc = br.calcCostForRoute(route.getPickup(),route.getDelivery());
             costMatrixBuilder.addTransportTimeAndDistance(i,i+1, tc.getTime(), tc.getDistance());
             //costMatrixBuilder.addTransportTime(i,i+1, tc.getTime());
+            routeInstructions.put(route,tc.getInstructions());
 
             tc = br.calcCostForRoute(route.getDelivery(),route.getPickup());
             costMatrixBuilder.addTransportTimeAndDistance(i+1,i, tc.getTime(), tc.getDistance());
             //costMatrixBuilder.addTransportTime(i+1,i, tc.getTime());
+            routeInstructions.put(new PDRoute("wasweissich", route.getDelivery(),route.getPickup(), 1),tc.getInstructions());
 
 
             for(int j = 0; j<routes.size();j++) {
@@ -186,37 +186,45 @@ public class ProblemBuilder {
                 tc = br.calcCostForRoute(route.getDelivery(),altRoute.getPickup());
                 costMatrixBuilder.addTransportTimeAndDistance(i+1,2*j, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(i+1,2*j, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", route.getDelivery(),altRoute.getPickup(), 1),tc.getInstructions());
 
                 tc = br.calcCostForRoute(altRoute.getDelivery(),route.getPickup());
                 costMatrixBuilder.addTransportTimeAndDistance(2*j+1,i, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j,i+1, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", altRoute.getDelivery(),route.getPickup(), 1),tc.getInstructions());
 
 
                 tc = br.calcCostForRoute(route.getDelivery(),altRoute.getDelivery());
                 costMatrixBuilder.addTransportTimeAndDistance(i+1,2*j+1, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(i+1,2*j+1, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", route.getDelivery(),altRoute.getDelivery(), 1),tc.getInstructions());
 
                 tc = br.calcCostForRoute(altRoute.getDelivery(),route.getDelivery());
                 costMatrixBuilder.addTransportTimeAndDistance(2*j+1,i+1, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j+1,i+1, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", altRoute.getDelivery(),route.getDelivery(), 1),tc.getInstructions());
 
 
                 tc = br.calcCostForRoute(route.getPickup(),altRoute.getPickup());
                 costMatrixBuilder.addTransportTimeAndDistance(i,2*j, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(i,2*j, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", route.getPickup(),altRoute.getPickup(), 1),tc.getInstructions());
 
                 tc = br.calcCostForRoute(altRoute.getPickup(),route.getPickup());
                 costMatrixBuilder.addTransportTimeAndDistance(2*j,i, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j,i, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", altRoute.getPickup(),route.getPickup(), 1),tc.getInstructions());
 
 
                 tc = br.calcCostForRoute(route.getPickup(),altRoute.getDelivery());
                 costMatrixBuilder.addTransportTimeAndDistance(i,2*j+1, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(i,2*j+1, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", route.getPickup(),altRoute.getPickup(), 1),tc.getInstructions());
 
                 tc = br.calcCostForRoute(altRoute.getPickup(),route.getDelivery());
                 costMatrixBuilder.addTransportTimeAndDistance(2*j,i+1, tc.getTime(), tc.getDistance());
                 //costMatrixBuilder.addTransportTime(2*j+1,i, tc.getTime());
+                routeInstructions.put(new PDRoute("wasweissich", altRoute.getDelivery(),route.getDelivery(), 1),tc.getInstructions());
             }
             i +=2;
 
@@ -224,6 +232,7 @@ public class ProblemBuilder {
         }
 
         FastVehicleRoutingTransportCostsMatrix costMatrix = costMatrixBuilder.build();
+        routeInstructionsMap = routeInstructions;
         return costMatrix;
 
     }
@@ -247,4 +256,8 @@ public class ProblemBuilder {
     }
 
     public List<VehicleDefinition> getVehicles() { return vehicles; }
+
+    public Map<PDRoute,InstructionList> getRouteInstructionsMap() {
+        return routeInstructionsMap;
+    }
 }

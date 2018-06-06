@@ -21,6 +21,16 @@ public class Place {
         this.locID = locID;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this.getLon() == ((Place) obj).getLon() && this.getLat() == ((Place) obj).getLat();
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (getLat()*10000+getLon()*10000);
+    }
+
     public double getLat() {
         return lat;
     }

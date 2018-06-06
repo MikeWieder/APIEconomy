@@ -1,4 +1,7 @@
 import com.graphhopper.util.InstructionList;
+import com.graphhopper.util.PointList;
+
+import java.nio.file.Path;
 
 
 /**
@@ -12,11 +15,19 @@ public class TransportationCost {
     private int time;
     private int distance;
     private InstructionList instructions;
+    private PointList pathList;
 
     public TransportationCost(int time, int distance, InstructionList instructions) {
         this.time = time;
         this.distance = distance;
         this.instructions = instructions;
+    }
+
+    public TransportationCost(int time, int distance, InstructionList instructions, PointList pathList) {
+        this.time = time;
+        this.distance = distance;
+        this.instructions = instructions;
+        this.pathList = pathList;
     }
 
     public int getDistance() {
@@ -29,5 +40,9 @@ public class TransportationCost {
 
     public InstructionList getInstructions() {
         return instructions;
+    }
+
+    public PointList getPathList() {
+        return pathList;
     }
 }

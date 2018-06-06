@@ -48,6 +48,17 @@ public class BaseRouting {
 
         // TODO: 29.05.2018 handle errors
         PathWrapper path = hopper.route(buildRequest(start,destination)).getBest();
+        /*PointList list = path.getWaypoints();
+        for(int i = 0; i<list.getSize();i++) {
+            System.out.println("lon: " + list.getLon(i) + " lat: " + list.getLat(i));
+        }
+        System.out.println("----------------------------------------------------");*/
+
+        /*for(Instruction instruction : path.getInstructions()) {
+            System.out.println(instruction.getPoints().getLat(0));
+        }
+        System.out.println("-------------------------------");*/
+
         return processResults(path);
 
     }

@@ -1,10 +1,13 @@
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.util.Instruction;
+import com.graphhopper.util.InstructionList;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,7 +29,7 @@ public class JSONBuilder {
      * @param distances Gesamte Distanz der einzelnen Routen
      * @return String, welcher das erzeugte JSON beinhaltet
      */
-    public String buildSolutionJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, int[] distances) {
+    public String buildSolutionJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, int[] distances, Map<PDRoute,InstructionList> routeInstructions) {
 
 
         Double totalTime = 0.;
@@ -42,18 +45,37 @@ public class JSONBuilder {
             JSONObject stepLocation = new JSONObject();
 
             int stepCount = 0;
-
+            Place locationMem = null;
             for(TourActivity activity :vr.getActivities()) {
                 totalTime = activity.getArrTime();
                 int activityIndex = activity.getIndex();
 
                 PDRoute route = routes.get((activityIndex-1)/2);
                 Place location;
+
                 if(activityIndex % 2 == 0) {
                     location = route.getPickup();
                 }else {
                     location = route.getDelivery();
                 }
+
+                if(locationMem == null) {
+                    locationMem = location;
+                } else {
+                    PDRoute instrRoute = new PDRoute("abc", locationMem, location, 1);
+                    System.out.println(locationMem.getLat() + " --- " + locationMem.getLon());
+                    System.out.println(location.getLat() + " --- " + location.getLon());
+
+                    InstructionList instructions = routeInstructions.get(instrRoute);
+                    System.out.println(instructions);
+
+                    for(Instruction instruction : instructions) {
+                        System.out.println(instruction.getPoints().getLat(0));
+                        System.out.println(instruction.getPoints().getLon(0));
+                    }
+                    locationMem = location;
+                }
+
                 stepLocation.put("x", location.getLat()).put("y", location.getLon());
                 step.put("Location", stepLocation);
                 steps.put(stepCount, step);

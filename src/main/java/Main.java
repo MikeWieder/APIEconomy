@@ -53,7 +53,7 @@ public class Main {
         List<VehicleDefinition> vehicles = new ArrayList<>();
 
         VehicleDefinition vehicle1 = new VehicleDefinition("vehicle1", 4, start1);
-        VehicleDefinition vehicle2 = new VehicleDefinition("vehicle1", 4, start1);
+        VehicleDefinition vehicle2 = new VehicleDefinition("vehicle2", 4, start1);
 
         vehicles.add(vehicle1);
         vehicles.add(vehicle2);
@@ -69,6 +69,8 @@ public class Main {
         SolutionPrinter.print(problem,solution,SolutionPrinter.Print.VERBOSE);
         FastVehicleRoutingTransportCostsMatrix costsMatrix = (FastVehicleRoutingTransportCostsMatrix) problem.getTransportCosts();
         Map<String, Job> jobs = problem.getJobs();
+
+        Map<PDRoute,InstructionList> routeInstructions = builder.getRouteInstructionsMap();
 
         int totalDistance = 0;
         int[] distances = new int[solution.getRoutes().size()];
@@ -116,8 +118,10 @@ public class Main {
 
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
-        String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distances);
+        String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distances,routeInstructions);
         System.out.println(jsonString);
+
+
     }
 
 }
