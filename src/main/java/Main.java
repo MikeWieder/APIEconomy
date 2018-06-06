@@ -22,6 +22,10 @@ public class Main {
 
     public static void main(String args[]) {
 
+        JSONReader reader = new JSONReader();
+        reader.readJSON();
+
+
         List<PDRoute> routes = new ArrayList<>();
 
         // Hier werden die Routenpunkte(Pickups+Deliveries angelegt), sollte aus dem Input-JSON ausgelesen und damit erzeugt werden.
@@ -59,11 +63,11 @@ public class Main {
         vehicles.add(vehicle2);
 
 
-        BaseRouting br = new BaseRouting("", "C:\\Users\\Mike\\Documents\\GraphhopperResults");
+        BaseRouting br = new BaseRouting("", "D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\results");
         //Test: System.out.println(br.calcCostForRoute(start1,start6).getDistance());
 
         PDOptmizer opti = new PDOptmizer();
-        ProblemBuilder builder = new ProblemBuilder(br, routes, vehicles);
+        ProblemBuilder builder = new ProblemBuilder(br, reader.getPdRouteList(), reader.getVehicleDefinitionList());
         VehicleRoutingProblem problem = builder.buildProblem();
         VehicleRoutingProblemSolution solution = opti.buildSolution(problem);
         SolutionPrinter.print(problem,solution,SolutionPrinter.Print.VERBOSE);

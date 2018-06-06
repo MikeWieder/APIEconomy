@@ -233,6 +233,7 @@ public class ProblemBuilder {
 
         FastVehicleRoutingTransportCostsMatrix costMatrix = costMatrixBuilder.build();
         routeInstructionsMap = routeInstructions;
+        System.out.println("______________________________________________________________"+costMatrix.getDistance(1,2));
         return costMatrix;
 
     }

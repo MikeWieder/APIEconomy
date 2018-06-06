@@ -49,7 +49,7 @@ public class JSONReader {
 
         JSONArray services = (JSONArray) inputObject.get("services");
 
-        int placeID = 1;
+        int placeID = 0;
         for (Object o : services){
 
             JSONObject serviceObjects = (JSONObject) o;
@@ -61,6 +61,8 @@ public class JSONReader {
             String locName = (String) serviceObjects.get("pickup-name_city");
 
             pickup = new Place(lat, lon, locName, placeID);
+
+            placeID++;
 
             JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
             lat = Double.parseDouble( (String) pickupLocation.get("x"));

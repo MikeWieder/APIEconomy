@@ -6,7 +6,7 @@
 ],
 
   "services":[
-    {"jobid" : "jobID1", "pickup" : {"x" : "48.506939", "y" : "9.203804"}, "pickup-name_city" : "Reutlingen", "delivery": {"x" : "48.135125", "y" : "11.581980"}, "delivery-name_city" : "München", "capacity" : "1" },
+    {"jobid" : "jobID1", "pickup" : {"x" : "48.506939", "y" : "9.203804"}, "pickup-name_city" : "Reutlingen", "delivery": {"x" : "48.642513", "y" : "9.459418"}, "delivery-name_city" : "Kirchheim u.T.", "capacity" : "1" },
     {"jobid" : "jobID2", "pickup" : {"x" : "48.775846", "y" : "9.182932"}, "pickup-name_city" : "Stuttgart", "delivery": {"x" : "48.506939", "y" : "9.203804"}, "delivery-name_city" : "Reutlingen", "capacity" : "1" },
     {"jobid" : "jobID3", "pickup" : {"x" : "48.401082", "y" : "9.987608"}, "pickup-name_city" : "Ulm", "delivery": {"x" : "49.006890", "y" : "8.403653"}, "delivery-name_city" : "Karlsruhe", "capacity" : "1" }
   ]

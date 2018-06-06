@@ -28,7 +28,7 @@ public class BaseRouting {
     }
     // TODO: 29.05.2018 actually consider the supplied String for loading the correct map
     public void setMap(String mapType) {
-        hopper.setDataReaderFile("C:\\Users\\mike-\\Downloads\\baden-wuerttemberg-latest.osm.pbf");
+        hopper.setDataReaderFile("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\baden-wuerttemberg-latest.osm.pbf");
 }
 
     public void setOutput(String outputLocation) {
@@ -89,6 +89,7 @@ public class BaseRouting {
         double cost = 0;
         cost += path.getTime()/60000;
         cost += path.getDistance()/1000;
+        System.out.println(cost);
         return new TransportationCost((int)path.getTime()/60000, (int)(path.getDistance()/1000), path.getInstructions());
     }
 
