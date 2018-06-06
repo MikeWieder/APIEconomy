@@ -64,20 +64,20 @@ public class ProblemBuilder {
 
         for(VehicleDefinition vehicle : vehicles) {
             //startLocation = Location.Builder.newInstance().setId(vehicle.getName()).setIndex(vehicle.getId()).build();
-            for(Shipment shipment : shipments) {
+            //for(Shipment shipment : shipments) {
 //                System.out.println(shipment.getPickupLocation().getId());
 //                System.out.println(vehicle.getStartLocation().getLocID());
-                if(Integer.parseInt(shipment.getPickupLocation().getId()) == vehicle.getStartLocation().getLocID() || shipment.getDeliveryLocation().getIndex() == vehicle.getStartLocation().getLocID() ) {
-                    startLocation = shipment.getPickupLocation();
-                }
-            }
+                //if(Integer.parseInt(shipment.getPickupLocation().getId()) == vehicle.getStartLocation().getLocID() || shipment.getDeliveryLocation().getIndex() == vehicle.getStartLocation().getLocID() ) {
+                    //startLocation = shipment.getPickupLocation();
+                //}
+            //}
 //            System.out.println(vehicle.getName());
-            builder.addVehicle(buildVehicle(startLocation, vehicle.getName(), vehicle.getCapacity(),false));
+            builder.addVehicle(buildVehicle(vehicle,false));
         }
         //builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
         //builder.addVehicle(buildVehicle(startLocation, "vehicle2", 4, false));
 
-        Random random = new Random();
+        //Random random = new Random();
 
         /*for(int i = 0; i<getRoutes().size()*2;i++) {
             builder.addLocation(Integer.toString(i), Coordinate.newInstance(random.nextDouble()*10,random.nextDouble()*10));
@@ -102,19 +102,14 @@ public class ProblemBuilder {
         List<Shipment> shipments = new ArrayList<>();
         List<PDRoute> routes = getRoutes();
 
-        int i = 0;
-
         for(PDRoute route : routes) {
 
             //TimeWindow tw = new TimeWindow(0,20);
-            Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,1).setPickupLocation(Location.Builder.newInstance()
-                    .setIndex(i).setId(Integer.toString(route.getPickup().getLocID())).build())
-                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(i+1).setId(Integer.toString(route.getDelivery().getLocID())).build()).setName(route.getJobName()).build();
+            Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,route.getCapacity()).setPickupLocation(Location.Builder.newInstance()
+                    .setIndex(route.getPickup().getLocID()).setId(Integer.toString(route.getPickup().getLocID())).build())
+                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(route.getDelivery().getLocID()).setId(Integer.toString(route.getDelivery().getLocID())).build()).setName(route.getJobName()).build();
 
             shipments.add(shipment);
-            TimeWindow tw = new TimeWindow(0,20);
-
-            i += 2;
         }
 
         return shipments;
@@ -122,17 +117,14 @@ public class ProblemBuilder {
 
     /**
      *
-     * @param startLocation Der Ort, an dem sich das Fahrzeug zu Beginn befindet. Die Location muss in der CostMatrix vorhanden sein,
-     *                      <br> da sonst der erste Schritt nicht berechnet werden kann.
-     * @param name Entspricht einfach dem Namen des Fahrzeugs(ähnlich ID?)
-     * @param capacity Kapazität des Fahrzeugs
+     * @param vehicle Beschreibung des zu erzeugenden Fahrzeugs
      * @param returnToStart Bei true fährt das Fahrzeug nach dem abschließen des letzten Shipments zu seiner Startposition zurück.
      * @return Liefert das erzeugte Fahrzeug zurück, welches dem Problem hinzugefügt werden kann.
      */
-    private VehicleImpl buildVehicle(Location startLocation, String name, int capacity, boolean returnToStart) {
-        VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, 4).setCostPerDistance(1).setCostPerTransportTime(1).build();
-        return VehicleImpl.Builder.newInstance(name).setReturnToDepot(returnToStart)
-                .setStartLocation(startLocation).setType(type).build();
+    private VehicleImpl buildVehicle(VehicleDefinition vehicle, boolean returnToStart) {
+        VehicleType type = VehicleTypeImpl.Builder.newInstance("type").addCapacityDimension(0, vehicle.getCapacity()).setCostPerDistance(1).setCostPerTransportTime(1).build();
+        return VehicleImpl.Builder.newInstance(vehicle.getName()).setReturnToDepot(returnToStart)
+                .setStartLocation(Location.Builder.newInstance().setIndex(vehicle.getStartLocation().getLocID()).setId(Integer.toString(vehicle.getStartLocation().getLocID())).setName(vehicle.getName()).build()).setType(type).build();
     }
 
 
@@ -148,15 +140,37 @@ public class ProblemBuilder {
 
         // TODO: 03.06.2018  Change the indices in the cost Matrix to the IDs of the Place objects
         List<PDRoute> routes = getRoutes();
+        List<VehicleDefinition> vehicles = getVehicles();
         Map<PDRoute,InstructionList> routeInstructions = new TreeMap<>();
         BaseRouting br = getBr();
 
-        FastVehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = FastVehicleRoutingTransportCostsMatrix.Builder.newInstance(routes.size()*2,false);
+        FastVehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = FastVehicleRoutingTransportCostsMatrix.Builder.newInstance(routes.size()*2+getVehicles().size(),false);
 
-        int i = 0;
+        List<Place> places = buildListWithAllPlaces(routes,vehicles);
+
+        Place start;
+        Place destination;
+        TransportationCost tc;
+        for(int i = 0; i < places.size(); i++) {
+            start = places.get(i);
+            for(int j = i+1; j < places.size(); j++) {
+                destination = places.get(j);
+                //"Hinweg"
+                tc = br.calcCostForRoute(start,destination);
+                costMatrixBuilder.addTransportTimeAndDistance(start.getLocID(),destination.getLocID(),tc.getTime(),tc.getDistance());
+                routeInstructions.put(new PDRoute(""+start.getLocID() + " to " + destination.getLocID(),start,destination,1), tc.getInstructions());
+
+                //"Rueckweg"
+                tc = br.calcCostForRoute(destination,start);
+                costMatrixBuilder.addTransportTimeAndDistance(destination.getLocID(),start.getLocID(),tc.getTime(),tc.getDistance());
+                routeInstructions.put(new PDRoute(""+destination.getLocID() + " to " + start.getLocID(),destination,start,1), tc.getInstructions());
+            }
+
+        }
 
 
 
+       /* int i = 0;
         for(PDRoute route : routes) {
 
 
@@ -229,13 +243,42 @@ public class ProblemBuilder {
             i +=2;
 
 
-        }
+        }*/
 
         FastVehicleRoutingTransportCostsMatrix costMatrix = costMatrixBuilder.build();
+
+        /*for(int i = 0; i<places.size();i++){
+            for(int j = 0; j<places.size();j++) {
+                if(i==j) continue;
+                for(Place place : places) {
+                    if(place.getLocID() == i) {
+                        //System.out.println("Von: " + place.toString());
+                    }
+                    if(place.getLocID() == j) {
+                        //System.out.println("Nach: " + place.toString());
+                    }
+                }
+                //System.out.println("Von: "+i+ " Nach: "+j+ " " +costMatrix.getDistance(i,j));
+            }
+        }*/
+
         routeInstructionsMap = routeInstructions;
-        System.out.println("______________________________________________________________"+costMatrix.getDistance(1,2));
         return costMatrix;
 
+    }
+
+    public List<Place> buildListWithAllPlaces(List<PDRoute> routes, List<VehicleDefinition> vehicles) {
+        List<Place> places = new ArrayList<>();
+
+        for(PDRoute route : routes) {
+            places.add(route.getPickup());
+            places.add(route.getDelivery());
+        }
+        for(VehicleDefinition vehicle : vehicles) {
+            places.add(vehicle.getStartLocation());
+        }
+
+        return places;
     }
 
     public TransportationCost[] performCostCalc(PDRoute route) {

@@ -98,7 +98,7 @@ public class JSONReader {
     //method to generate a List of VehicleDefiniton objects
     private void generateVehicleDefinitionList(int placeID, JSONObject inputObject) {
         JSONArray vehicles = (JSONArray) inputObject.get("vehicles");
-
+        placeID *=2;
         int vehicleID = 0;
         for (Object o : vehicles){
 

@@ -63,15 +63,15 @@ public class JSONBuilder {
                     locationMem = location;
                 } else {
                     PDRoute instrRoute = new PDRoute("abc", locationMem, location, 1);
-                    System.out.println(locationMem.getLat() + " --- " + locationMem.getLon());
-                    System.out.println(location.getLat() + " --- " + location.getLon());
+                    //System.out.println(locationMem.getLat() + " --- " + locationMem.getLon());
+                    //System.out.println(location.getLat() + " --- " + location.getLon());
 
                     InstructionList instructions = routeInstructions.get(instrRoute);
-                    System.out.println(instructions);
+                    //System.out.println(instructions);
 
                     for(Instruction instruction : instructions) {
-                        System.out.println(instruction.getPoints().getLat(0));
-                        System.out.println(instruction.getPoints().getLon(0));
+                        //System.out.println(instruction.getPoints().getLat(0));
+                        //System.out.println(instruction.getPoints().getLon(0));
                     }
                     locationMem = location;
                 }
@@ -86,7 +86,7 @@ public class JSONBuilder {
             routeObject.put("totalTime",totalTime).put("totalDistance",distances[routeCount]);
             routeObject.put("steps",steps);
             array.put(routeCount, routeObject);
-            System.out.println(stepCount + "-------------------------------------------------------");
+            //System.out.println(stepCount + "-------------------------------------------------------");
             routeCount++;
 
         }

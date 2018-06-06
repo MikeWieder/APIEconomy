@@ -89,7 +89,7 @@ public class BaseRouting {
         double cost = 0;
         cost += path.getTime()/60000;
         cost += path.getDistance()/1000;
-        System.out.println(cost);
+        //System.out.println(cost);
         return new TransportationCost((int)path.getTime()/60000, (int)(path.getDistance()/1000), path.getInstructions());
     }
 
