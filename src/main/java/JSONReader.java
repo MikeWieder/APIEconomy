@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JSONReader {
-    //JSON parser object to parse read file
-    private JSONParser parser = new JSONParser();
+
+    private JSONParser parser = new JSONParser(); //JSON parser object to parse read file
+
     private Place startLocation, pickup, delivery;
     private VehicleDefinition vehicleDefinition;
     private List<VehicleDefinition> vehicleDefinitionList = new ArrayList<>();
@@ -25,11 +26,13 @@ public class JSONReader {
                 JSONObject inputObject = (JSONObject) parser.parse(
                         new FileReader("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\Input.json"));
 
-                //method to generate a List of VehicleDefiniton objects
-                generateVehicleDefinitionList(inputObject);
-
                 //method to generate a List of PDRoute objects
-                generatePDRouteList(inputObject);
+                //returns integer placeID to pass its value to the Vehicle List
+                //--> Place objects are numbered continuously
+                int placeID = generatePDRouteList(inputObject);
+
+                //method to generate a List of VehicleDefiniton objects
+                generateVehicleDefinitionList(placeID, inputObject);
 
             } catch (ParseException | IOException e) {
                 e.printStackTrace();
@@ -37,15 +40,16 @@ public class JSONReader {
         }
     }
 
+    // Getter for PDRoute list and Vehicle list
     public List<PDRoute> getPdRouteList() {
         return pdRouteList;
     }
-
     public List<VehicleDefinition> getVehicleDefinitionList() {
         return vehicleDefinitionList;
     }
 
-    private void generatePDRouteList(JSONObject inputObject) {
+    //method to generate a List of PDRoute objects
+    private int generatePDRouteList(JSONObject inputObject) {
 
         JSONArray services = (JSONArray) inputObject.get("services");
 
@@ -54,7 +58,7 @@ public class JSONReader {
 
             JSONObject serviceObjects = (JSONObject) o;
 
-            //read coordinates of pickup + delivery location; define 2 Place objects "pickup" & "delivery"
+            //read coordinates of pickup location; initialize Place objects
             JSONObject pickupLocation = (JSONObject) serviceObjects.get("pickup");
             double lat = Double.parseDouble( (String) pickupLocation.get("x"));
             double lon = Double.parseDouble( (String) pickupLocation.get("y"));
@@ -62,8 +66,8 @@ public class JSONReader {
 
             pickup = new Place(lat, lon, locName, placeID);
 
+            //read coordinates of pickup location; initialize Place object with placeID + 1
             placeID++;
-
             JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
             lat = Double.parseDouble( (String) pickupLocation.get("x"));
             lon = Double.parseDouble( (String) pickupLocation.get("y"));
@@ -79,17 +83,17 @@ public class JSONReader {
             System.out.println("Generated PDRoute object.");
 
             pdRouteList.add(pdRoute);
-            System.out.println("Elements within PDRouteList: "+pdRouteList.size());
-
+            System.out.println("Elements within PDRouteList: "+ pdRouteList.size());
             placeID++;
         }
+        return placeID;
     }
 
-    private void generateVehicleDefinitionList(JSONObject inputObject) {
+    //method to generate a List of VehicleDefiniton objects
+    private void generateVehicleDefinitionList(int placeID, JSONObject inputObject) {
         JSONArray vehicles = (JSONArray) inputObject.get("vehicles");
 
-        int vehicleID = 1;
-        int vehicleLocID = 1;
+        int vehicleID = 0;
         for (Object o : vehicles){
 
             JSONObject vehicleObjects = (JSONObject) o;
@@ -101,7 +105,7 @@ public class JSONReader {
             double lat = Double.parseDouble( (String) vehicleLocation.get("x"));
             double lon = Double.parseDouble( (String) vehicleLocation.get("y"));
             String locName = (String) vehicleObjects.get("loc-name_city");
-            startLocation = new Place(lat, lon, locName, vehicleLocID);
+            startLocation = new Place(lat, lon, locName, placeID);
 
             System.out.println("TEST PRINT");
             System.out.println(vehicleID +" "+ capacity +" "+ startLocation.getLocName()
@@ -113,7 +117,7 @@ public class JSONReader {
             vehicleDefinitionList.add(vehicleDefinition);
             System.out.println("Elements within VehicleDefinitionList: "+vehicleDefinitionList.size());
             vehicleID++;
-            vehicleLocID++;
+            placeID++;
         }
     }
 }
