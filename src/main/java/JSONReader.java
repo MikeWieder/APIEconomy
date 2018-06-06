@@ -28,7 +28,9 @@ public class JSONReader {
                 //method to generate a List of PDRoute objects
                 //returns integer placeID to pass its value to the Vehicle List
                 //--> Place objects are numbered continuously
-                int placeID = generatePDRouteList(inputObject);
+                generatePDRouteList(inputObject);
+
+                int placeID = getPdRouteList().size();
 
                 //method to generate a List of VehicleDefiniton objects
                 generateVehicleDefinitionList(placeID, inputObject);
@@ -48,7 +50,7 @@ public class JSONReader {
     }
 
     //method to generate a List of PDRoute objects
-    private int generatePDRouteList(JSONObject inputObject) {
+    private void generatePDRouteList(JSONObject inputObject) {
 
         JSONArray services = (JSONArray) inputObject.get("services");
 
@@ -91,7 +93,6 @@ public class JSONReader {
             System.out.println("Elements within PDRouteList: "+ pdRouteList.size());
             placeID++;
         }
-        return placeID;
     }
 
     //method to generate a List of VehicleDefiniton objects
@@ -121,7 +122,7 @@ public class JSONReader {
                     +" "+ startLocation.getLat() +" "+ startLocation.getLon());
 
             vehicleDefinition = new VehicleDefinition(uniqueName, capacity, startLocation);
-            System.out.println("Generated VehicleDefiniton object with ID "+vehicleID);
+            System.out.println("Generated VehicleDefiniton object with ID "+uniqueName+" ; Place location ID: "+placeID);
 
             vehicleDefinitionList.add(vehicleDefinition);
             System.out.println("Elements within VehicleDefinitionList: "+vehicleDefinitionList.size());
