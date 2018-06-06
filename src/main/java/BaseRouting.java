@@ -28,7 +28,7 @@ public class BaseRouting {
     }
     // TODO: 29.05.2018 actually consider the supplied String for loading the correct map
     public void setMap(String mapType) {
-        hopper.setDataReaderFile("D:\\IdeaProjects\\ApiEconomy\\src\\main\\resources\\baden-wuerttemberg-latest.osm.pbf");
+        hopper.setDataReaderFile("src/main/resources/baden-wuerttemberg-latest.osm.pbf");
 }
 
     public void setOutput(String outputLocation) {
