@@ -1,7 +1,7 @@
 {
   "vehicles":[
     {"id":"vehicleID1", "capacity":4, "startlocation":{
-      "lat":48.4863754,"lon":9.206289,"street":"Alteburgstrasse","houseNo":43,"city":"Reutlingen","zip":72762}
+      "lat":48.4863754,"lon":9.206289,"street":"Alteburgstrasse","houseNo":0,"city":"Reutlingen","zip":72762}
 
     },
     {"id":"vehicleID2", "capacity":4, "startlocation":{
@@ -22,7 +22,7 @@
       "pickup":{
         "lat":48.757751,"lon":9.450042,"street":"Hauptstraße","houseNo":23,"city":"Baltmannsweiler","zip":73666},
       "delivery":{
-        "lat":48.004496,"lon":7.836053,"street":"Breisacher Straße","houseNo":"","city":"Freiburg im Breisgau","zip":79098}
+        "lat":48.004496,"lon":7.836053,"street":"Breisacher Straße","houseNo":0,"city":"Freiburg im Breisgau","zip":79098}
 
     },
     {"jobid":"jobID3", "capacity":1,
@@ -48,7 +48,7 @@
     },
     {"jobid":"jobID6", "capacity":1,
       "pickup":{
-        "lat":48.004496,"lon":7.836053,"street":"Breisacher Straße","houseNo":"","city":"Freiburg im Breisgau","zip":79098},
+        "lat":48.004496,"lon":7.836053,"street":"Breisacher Straße","houseNo":0,"city":"Freiburg im Breisgau","zip":79098},
       "delivery":{
         "lat":48.782300,"lon":9.176220,"street":"Friedrichstraße","houseNo":14,"city":"Stuttgart","zip":70174}
 

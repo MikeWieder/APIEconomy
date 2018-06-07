@@ -5,6 +5,9 @@ public class Place {
     private double lat;
     private double lon;
     private String city;
+    private String street;
+    private int houseNo;
+    private int zip;
     private int locID;
 
     /**
@@ -14,15 +17,14 @@ public class Place {
      * @param city Name des ortes
      * @param locID ID des Ortes
      */
-    public Place(double lat, double lon, String city, int locID) {
+    public Place(double lat, double lon, String city, String street, int houseNo, int zip, int locID) {
         this.lat = lat;
         this.lon = lon;
         this.city = city;
+        this.street = street;
+        this.houseNo = houseNo;
+        this.zip = zip;
         this.locID = locID;
-        //TODO (060618, MFO) add street. houseNo, zip
-        //+ street
-        //+ houseNo
-        //+ zip
     }
 
     @Override
@@ -43,12 +45,24 @@ public class Place {
         return lon;
     }
 
-    public int getLocID() {
-        return locID;
-    }
-
     public String getCity() {
         return city;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public int getHouseNo() {
+        return houseNo;
+    }
+
+    public int getZip() {
+        return zip;
+    }
+
+    public int getLocID() {
+        return locID;
     }
 
     public String toString() {

@@ -26,11 +26,9 @@ public class JSONReader {
                         new FileReader("src/main/resources/input_v2.json"));
 
                 //method to generate a List of PDRoute objects
-                //returns integer placeID to pass its value to the Vehicle List
-                //--> Place objects are numbered continuously
                 generatePDRouteList(inputObject);
 
-                int placeID = getPdRouteList().size();
+                int placeID = getPdRouteList().size()*2;
 
                 //method to generate a List of VehicleDefiniton objects
                 generateVehicleDefinitionList(placeID, inputObject);
@@ -40,7 +38,6 @@ public class JSONReader {
             }
         }
     }
-
     // Getter for PDRoute list and Vehicle list
     public List<PDRoute> getPdRouteList() {
         return pdRouteList;
@@ -64,26 +61,12 @@ public class JSONReader {
 
             //read coordinates and adress data of pickup location; initialize Place objects
             JSONObject pickupLocation = (JSONObject) serviceObjects.get("pickup");
-            double lat = (Double) pickupLocation.get("lat");
-            double lon = (Double) pickupLocation.get("lon");
-            String city = (String) pickupLocation.get("city");
-            //TODO (060618, MFO) add street. houseNo, zip
-            //+ street
-            //+ houseNo
-            //+ zip
-            pickup = new Place(lat, lon, city, placeID);
+            pickup = generatePlace(pickupLocation, placeID);
 
             //read coordinates and adress data of delivery location; initialize Place object with placeID + 1
             placeID++;
             JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
-            lat = (Double) deliveryLocation.get("lat");
-            lon = (Double) deliveryLocation.get("lon");
-            city = (String) deliveryLocation.get("city");
-            //TODO (060618, MFO) add street. houseNo, zip
-            //+ street
-            //+ houseNo
-            //+ zip
-            delivery = new Place(lat, lon, city, placeID);
+            delivery = generatePlace(deliveryLocation, placeID);
 
             // generate PDRoute object with Places "pickup" & "delivery"
             pdRoute = new PDRoute(jobID, pickup, delivery, capacity);
@@ -98,8 +81,6 @@ public class JSONReader {
     //method to generate a List of VehicleDefiniton objects
     private void generateVehicleDefinitionList(int placeID, JSONObject inputObject) {
         JSONArray vehicles = (JSONArray) inputObject.get("vehicles");
-        placeID *=2;
-        int vehicleID = 0;
         for (Object o : vehicles){
 
             JSONObject vehicleObjects = (JSONObject) o;
@@ -108,26 +89,26 @@ public class JSONReader {
             int capacity = (int) (long) vehicleObjects.get("capacity");
 
             JSONObject vehicleLocation = (JSONObject) vehicleObjects.get("startlocation");
-            double lat = (Double) vehicleLocation.get("lat");
-            double lon = (Double) vehicleLocation.get("lon");
-            String city = (String) vehicleLocation.get("city");
-            //TODO (060618, MFO) add street. houseNo, zip
-            //+ street
-            //+ houseNo
-            //+ zip
-            startLocation = new Place(lat, lon, city, placeID);
-
-            System.out.println("TEST PRINT");
-            System.out.println(vehicleID +" "+ capacity +" "+ startLocation.getCity()
-                    +" "+ startLocation.getLat() +" "+ startLocation.getLon());
+            startLocation = generatePlace(vehicleLocation, placeID);
 
             vehicleDefinition = new VehicleDefinition(uniqueName, capacity, startLocation);
-            System.out.println("Generated VehicleDefiniton object with ID "+uniqueName+" ; Place location ID: "+placeID);
-
             vehicleDefinitionList.add(vehicleDefinition);
-            System.out.println("Elements within VehicleDefinitionList: "+vehicleDefinitionList.size());
-            vehicleID++;
             placeID++;
+
+            System.out.println("TEST PRINT " +
+                    "\nGenerated VehicleDefiniton object with ID "+uniqueName+" ; Place location ID: "+placeID
+                    + "\nElements within VehicleDefinitionList: "+vehicleDefinitionList.size());
         }
+    }
+
+    private Place generatePlace(JSONObject location, int placeID) {
+        double lat = (Double) location.get("lat");
+        double lon = (Double) location.get("lon");
+        String city = (String) location.get("city");
+        String street = (String) location.get("street");
+        int houseNo = (int) (long) location.get("houseNo");
+        int zip = (int) (long) location.get("zip");
+
+        return new Place(lat, lon, city, street,  houseNo, zip, placeID);
     }
 }

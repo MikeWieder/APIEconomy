@@ -25,44 +25,6 @@ public class Main {
         JSONReader reader = new JSONReader();
         reader.readJSON();
 
-
-        List<PDRoute> routes = new ArrayList<>();
-
-        // Hier werden die Routenpunkte(Pickups+Deliveries angelegt), sollte aus dem Input-JSON ausgelesen und damit erzeugt werden.
-
-        Place start1 =  new Place(48.6480042, 9.4496037, "KH", 0); // Kirchheim
-        Place destination1 = new Place(48.4791793,9.186754, "RT", 1); // Hochschule Reutlingen
-        routes.add(new PDRoute( "job1", start1, destination1, 1));
-
-        Place start2 = new Place(48.6234705, 9.3428399, "NT", 2); //Nuertingen
-        Place destination2 = new Place(48.4936279, 9.3991581, "BU", 3); // Bad-Urach
-        routes.add(new PDRoute("job2",start2, destination2, 1));
-
-        Place start3 = new Place(48.6921222, 9.1977333, "FH", 4); // Flughafen
-        Place destination3 = new Place(48.5372796, 9.2846843, "MT", 5); // Metzingen
-        routes.add(new PDRoute("job3",start3, destination3, 1));
-
-        Place start4 = new Place(48.4107975, 9.4980255, "MS", 6); // Münsingen
-        Place destination4 = new Place(48.5219655, 9.0646742, "TU", 7); // Tübingen
-        routes.add(new PDRoute("job4",start4, destination4, 1));
-
-        Place start5 = new Place(48.7352218, 9.3169017, "ES", 8); // Esslingen
-        Place destination5 = new Place(48.7039347, 9.6508024, "GP", 9); // Göppingen
-        routes.add(new PDRoute("job5",start5, destination5, 1));
-
-        Place start6 = new Place(48.6724286, 9.5185991, "SB", 10); // Schlierbach
-        Place destination6 = new Place(48.8221525, 9.3343294, "WB", 11); // Waiblingen
-        routes.add(new PDRoute("job6",start6, destination6, 1));
-
-        List<VehicleDefinition> vehicles = new ArrayList<>();
-
-        VehicleDefinition vehicle1 = new VehicleDefinition("vehicle1", 4, start1);
-        VehicleDefinition vehicle2 = new VehicleDefinition("vehicle2", 4, start1);
-
-        vehicles.add(vehicle1);
-        vehicles.add(vehicle2);
-
-
         BaseRouting br = new BaseRouting("", "src/main/resources/results");
         //Test: System.out.println(br.calcCostForRoute(start1,start6).getDistance());
 
@@ -122,7 +84,7 @@ public class Main {
 
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
-        String jsonString =jsonBuilder.buildSolutionJSON(solution,routes,distances,routeInstructions);
+        String jsonString =jsonBuilder.buildSolutionJSON(solution,reader.getPdRouteList(),distances,routeInstructions);
         System.out.println(jsonString);
 
 
