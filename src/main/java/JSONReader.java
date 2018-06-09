@@ -3,8 +3,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +20,13 @@ public class JSONReader {
     public void readJSON (){
         {
             try {
+
+                InputStream in = getClass().getResourceAsStream("input_v2.json");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 // read + parse file and convert to JSONObject
-                JSONObject inputObject = (JSONObject) parser.parse(
-                        new FileReader("src/main/resources/input_v2.json"));
+                JSONObject inputObject = (JSONObject) parser.parse(reader);
+                //JSONObject inputObject = (JSONObject) parser.parse(
+                        //new FileReader(getClass().getResource("input_v2.json").getPath()));
 
                 //method to generate a List of PDRoute objects
                 generatePDRouteList(inputObject);

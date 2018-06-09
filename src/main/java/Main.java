@@ -25,8 +25,8 @@ public class Main {
         JSONReader reader = new JSONReader();
         reader.readJSON();
 
-        BaseRouting br = new BaseRouting("", "src/main/resources/results");
-        //Test: System.out.println(br.calcCostForRoute(start1,start6).getDistance());
+        // TODO: 09.06.2018  use args to set the paths
+        BaseRouting br = new BaseRouting("", "");
 
         PDOptmizer opti = new PDOptmizer();
         ProblemBuilder builder = new ProblemBuilder(br, reader.getPdRouteList(), reader.getVehicleDefinitionList());
