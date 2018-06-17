@@ -37,6 +37,8 @@ public class Main {
         Map<String, Job> jobs = problem.getJobs();
 
         Map<PDRoute,InstructionList> routeInstructions = builder.getRouteInstructionsMap();
+        List<PDRoute> routes = reader.getPdRouteList();
+        List<VehicleDefinition> vehilces = reader.getVehicleDefinitionList();
 
         int totalDistance = 0;
         int[] distances = new int[solution.getRoutes().size()];
@@ -84,7 +86,7 @@ public class Main {
 
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
-        String jsonString =jsonBuilder.buildSolutionJSON(solution,reader.getPdRouteList(),distances,routeInstructions);
+        String jsonString =jsonBuilder.buildGeoJSON(solution,routes,vehilces);
         System.out.println(jsonString);
 
 

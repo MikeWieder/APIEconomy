@@ -94,4 +94,43 @@ public class JSONBuilder {
         return array.toString();
     }
 
+    public String buildGeoJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, List<VehicleDefinition> vehicles) {
+        JSONObject outerObject = new JSONObject();
+        outerObject.put("type", "FeatureCollection");
+        JSONArray featureArray = new JSONArray();
+
+
+        for(VehicleRoute vr : solution.getRoutes()) {
+            JSONObject lineString = new JSONObject();
+            lineString.put("type", "LineString");
+            JSONObject feature = new JSONObject();
+            feature.put("type", "Feature");
+            JSONArray routeArray = new JSONArray();
+            for(TourActivity activity : vr.getActivities()) {
+                int index = activity.getLocation().getIndex();
+                JSONArray locEntry = new JSONArray();
+                for(PDRoute route : routes) {
+                    if(route.getPickup().getLocID() == index) {
+                        locEntry.put(route.getPickup().getLat());
+                        locEntry.put(route.getPickup().getLon());
+                    }
+                    if(route.getDelivery().getLocID() == index) {
+                        locEntry.put(route.getDelivery().getLat());
+                        locEntry.put(route.getDelivery().getLon());
+                    }
+                }
+                routeArray.put(locEntry);
+            }
+            lineString.put("coordinates", routeArray);
+            feature.put("geometry", lineString);
+            JSONObject properties = new JSONObject();
+            properties.put("vehicle", vr.getVehicle().getId());
+            feature.put("properties", properties);
+            featureArray.put(feature);
+        }
+        outerObject.put("features", featureArray);
+
+        return outerObject.toString();
+    }
+
 }
