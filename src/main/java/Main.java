@@ -11,19 +11,100 @@ import com.graphhopper.jsprit.core.util.FastVehicleRoutingTransportCostsMatrix;
 import com.graphhopper.reader.osm.GraphHopperOSM;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.util.*;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Envelope;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 
 public class Main {
 
+    private static final String RPC_QUEUE_NAME = "rpc_queue";
+
     public static void main(String args[]) {
 
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost("10.244.1.4");
+        factory.setPort(5672);
+
+        Connection connection = null;
+        try {
+            connection      = factory.newConnection();
+            final Channel channel = connection.createChannel();
+
+            channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
+            channel.queuePurge(RPC_QUEUE_NAME);
+
+            channel.basicQos(1);
+
+            System.out.println(" [x] Awaiting RPC requests");
+
+            Consumer consumer = new DefaultConsumer(channel) {
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    AMQP.BasicProperties replyProps = new AMQP.BasicProperties
+                            .Builder()
+                            .correlationId(properties.getCorrelationId())
+                            .build();
+
+                    String response = "";
+
+                    try {
+                        response += performOpt(body);
+                    }
+                    catch (RuntimeException e){
+                        System.out.println(" [.] " + e.toString());
+                    }
+                    finally {
+                        channel.basicPublish( "", properties.getReplyTo(), replyProps, response.getBytes("UTF-8"));
+                        channel.basicAck(envelope.getDeliveryTag(), false);
+                        // RabbitMq consumer worker thread notifies the RPC server owner thread
+                        synchronized(this) {
+                            this.notify();
+                        }
+                    }
+                }
+            };
+
+            channel.basicConsume(RPC_QUEUE_NAME, false, consumer);
+            // Wait and be prepared to consume the message from RPC client.
+            while (true) {
+                synchronized(consumer) {
+                    try {
+                        consumer.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (connection != null)
+                try {
+                    connection.close();
+                } catch (IOException _ignore) {}
+        }
+
+
+
+    }
+
+    public static byte[] performOpt(byte[] request) {
+
         JSONReader reader = new JSONReader();
-        reader.readJSON();
+        reader.readJSONFromByte(request);
 
         // TODO: 09.06.2018  use args to set the paths
         BaseRouting br = new BaseRouting("", "");
@@ -87,9 +168,23 @@ public class Main {
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
         String jsonString =jsonBuilder.buildGeoJSON(solution,routes,vehilces);
+        try {
+            File file = new File(".." + File.separator + "output" + File.separator + "output.json");
+            file.createNewFile();
+            FileWriter fileWriter = new FileWriter(file);
+            BufferedWriter writer = new BufferedWriter(fileWriter);
+            writer.write(jsonString);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(jsonString);
 
-
+        return jsonString.getBytes();
     }
 
 }

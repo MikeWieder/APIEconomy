@@ -130,7 +130,7 @@ public class JSONBuilder {
         }
         outerObject.put("features", featureArray);
 
-        return outerObject.toString();
+        return outerObject.toString(1);
     }
 
 }

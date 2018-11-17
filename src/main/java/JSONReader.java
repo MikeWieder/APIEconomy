@@ -4,6 +4,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +20,14 @@ public class JSONReader {
 
     public void readJSON (){
         {
-            try {
 
+            try {
+                System.out.println(System.getProperty("user.dir"));
                 InputStream in = getClass().getResourceAsStream("input_v2.json");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                //BufferedReader reader = new BufferedReader(new FileReader("input_v2.json"));
                 // read + parse file and convert to JSONObject
-                JSONObject inputObject = (JSONObject) parser.parse(reader);
+                org.json.JSONObject inputObject = (org.json.JSONObject) parser.parse(reader);
                 //JSONObject inputObject = (JSONObject) parser.parse(
                         //new FileReader(getClass().getResource("input_v2.json").getPath()));
 
@@ -41,6 +44,14 @@ public class JSONReader {
             }
         }
     }
+
+    public void readJSONFromByte(byte[] json) {
+
+        org.json.JSONObject inputObject =  new org.json.JSONObject(new String(json));
+        generatePDRouteList(inputObject);
+
+    }
+
     // Getter for PDRoute list and Vehicle list
     public List<PDRoute> getPdRouteList() {
         return pdRouteList;
@@ -50,7 +61,7 @@ public class JSONReader {
     }
 
     //method to generate a List of PDRoute objects
-    private void generatePDRouteList(JSONObject inputObject) {
+    private void generatePDRouteList(org.json.JSONObject inputObject) {
 
         JSONArray services = (JSONArray) inputObject.get("services");
 
@@ -63,12 +74,12 @@ public class JSONReader {
             int capacity = (int) (long) serviceObjects.get("capacity");
 
             //read coordinates and adress data of pickup location; initialize Place objects
-            JSONObject pickupLocation = (JSONObject) serviceObjects.get("pickup");
+            org.json.JSONObject pickupLocation = (org.json.JSONObject) serviceObjects.get("pickup");
             pickup = generatePlace(pickupLocation, placeID);
 
             //read coordinates and adress data of delivery location; initialize Place object with placeID + 1
             placeID++;
-            JSONObject deliveryLocation = (JSONObject) serviceObjects.get("delivery");
+            org.json.JSONObject deliveryLocation = (org.json.JSONObject) serviceObjects.get("delivery");
             delivery = generatePlace(deliveryLocation, placeID);
 
             // generate PDRoute object with Places "pickup" & "delivery"
@@ -82,7 +93,7 @@ public class JSONReader {
     }
 
     //method to generate a List of VehicleDefiniton objects
-    private void generateVehicleDefinitionList(int placeID, JSONObject inputObject) {
+    private void generateVehicleDefinitionList(int placeID, org.json.JSONObject inputObject) {
         JSONArray vehicles = (JSONArray) inputObject.get("vehicles");
         for (Object o : vehicles){
 
@@ -91,7 +102,7 @@ public class JSONReader {
             String uniqueName = (String) vehicleObjects.get("id");
             int capacity = (int) (long) vehicleObjects.get("capacity");
 
-            JSONObject vehicleLocation = (JSONObject) vehicleObjects.get("startlocation");
+            org.json.JSONObject vehicleLocation = (org.json.JSONObject) vehicleObjects.get("startlocation");
             startLocation = generatePlace(vehicleLocation, placeID);
 
             vehicleDefinition = new VehicleDefinition(uniqueName, capacity, startLocation);
@@ -104,7 +115,7 @@ public class JSONReader {
         }
     }
 
-    private Place generatePlace(JSONObject location, int placeID) {
+    private Place generatePlace(org.json.JSONObject location, int placeID) {
         double lat = (Double) location.get("lat");
         double lon = (Double) location.get("lon");
         String city = (String) location.get("city");
