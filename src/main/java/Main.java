@@ -47,7 +47,7 @@ public class Main {
 
             channel.basicQos(1);
 
-            System.out.println(" [x] Awaiting RPC requests");
+            System.out.println("Awaiting RPC requests");
 
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override

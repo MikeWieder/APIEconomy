@@ -47,7 +47,12 @@ public class JSONReader {
 
     public void readJSONFromByte(byte[] json) {
 
-        org.json.JSONObject inputObject =  new org.json.JSONObject(new String(json));
+        org.json.JSONObject inputObject = null;
+        try {
+            inputObject = new org.json.JSONObject(new String(json, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         generatePDRouteList(inputObject);
 
     }
