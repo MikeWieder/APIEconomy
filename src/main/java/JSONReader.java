@@ -54,6 +54,7 @@ public class JSONReader {
             e.printStackTrace();
         }
         generatePDRouteList(inputObject);
+        generateVehicleDefinitionList(getPdRouteList().size()*2, inputObject);
 
     }
 
