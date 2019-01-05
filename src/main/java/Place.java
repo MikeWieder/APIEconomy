@@ -1,3 +1,5 @@
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
+
 /**
  * Klasse zum Speichern von "Orten", diese können entweder Pickup oder Delivery Locations sein, wird hier nicht weiter unterschieden(evtl. sinnvoll?)
  */
@@ -9,6 +11,7 @@ public class Place {
     private int houseNo;
     private int zip;
     private int locID;
+    private TimeWindow timeWindow;
 
     /**
      *
@@ -16,7 +19,19 @@ public class Place {
      * @param lon longitude des Ortes
      * @param city Name des ortes
      * @param locID ID des Ortes
+     * @param timeWindow Zeitfenster zum Abarbeiten des Jobs
      */
+    public Place(double lat, double lon, String city, String street, int houseNo, int zip, int locID, TimeWindow timeWindow) {
+        this.lat = lat;
+        this.lon = lon;
+        this.city = city;
+        this.street = street;
+        this.houseNo = houseNo;
+        this.zip = zip;
+        this.locID = locID;
+        this.timeWindow = timeWindow;
+    }
+
     public Place(double lat, double lon, String city, String street, int houseNo, int zip, int locID) {
         this.lat = lat;
         this.lon = lon;
@@ -25,6 +40,11 @@ public class Place {
         this.houseNo = houseNo;
         this.zip = zip;
         this.locID = locID;
+
+    }
+
+    public TimeWindow getTimeWindow() {
+        return timeWindow;
     }
 
     @Override

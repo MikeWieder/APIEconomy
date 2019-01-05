@@ -30,13 +30,18 @@ public class BaseRouting {
     }
     // TODO: 29.05.2018 actually consider the supplied String for loading the correct map
     public void setMap(String mapType) {
-        hopper.setDataReaderFile(getClass().getResource("baden-wuerttemberg-latest.osm.pbf").getPath());
+        //hopper.setDataReaderFile(getClass().getResource("baden-wuerttemberg-latest.osm.pbf").getPath());
         //hopper.setDataReaderFile("../results/baden-wuerttemberg-latest.osm.pbf");
         //hopper.setDataReaderFile(mapType);
 }
 
     public void setOutput(String outputLocation) {
-        String path = getClass().getResource("/results/").getPath();
+        String path = "results";
+        try {
+            //path = getClass().getResource("/results/").getPath();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         //String path = "../results";
         hopper.setGraphHopperLocation(path);
         //hopper.setGraphHopperLocation(outputLocation);

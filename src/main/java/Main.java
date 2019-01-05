@@ -34,8 +34,11 @@ public class Main {
     public static void main(String args[]) {
 
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("10.244.1.4");
+        factory.setHost("10.244.2.27");
         factory.setPort(5672);
+
+        //factory.setHost("134.103.195.110");
+        //factory.setPort(31834);
 
         Connection connection = null;
         try {
@@ -60,7 +63,13 @@ public class Main {
                     String response = "";
 
                     try {
-                        response += performOpt(body);
+                        byte[] output = performOpt(body);
+                        if(output != null) {
+                            response += new String(output, "UTF-8");
+                        }
+                        else {
+                            response = "'error':'app'";
+                        }
                     }
                     catch (RuntimeException e){
                         System.out.println(" [.] " + e.toString());
@@ -168,20 +177,20 @@ public class Main {
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
         String jsonString =jsonBuilder.buildGeoJSON(solution,routes,vehilces);
-        try {
-            File file = new File(".." + File.separator + "output" + File.separator + "output.json");
-            file.createNewFile();
-            FileWriter fileWriter = new FileWriter(file);
-            BufferedWriter writer = new BufferedWriter(fileWriter);
-            writer.write(jsonString);
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            File file = new File(".." + File.separator + "output" + File.separator + "output.json");
+//            file.createNewFile();
+//            FileWriter fileWriter = new FileWriter(file);
+//            BufferedWriter writer = new BufferedWriter(fileWriter);
+//            writer.write(jsonString);
+//            writer.close();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         System.out.println(jsonString);
 
         return jsonString.getBytes();

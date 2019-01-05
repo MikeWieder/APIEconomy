@@ -1,16 +1,20 @@
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JSONReader {
 
-    private JSONParser parser = new JSONParser(); //JSON parser object to parse read file
+//    private JSONParser parser = new JSONParser(); //JSON parser object to parse read file
+    private JSONTokener tokener;
 
     private Place startLocation, pickup, delivery;
     private VehicleDefinition vehicleDefinition;
@@ -21,27 +25,26 @@ public class JSONReader {
     public void readJSON (){
         {
 
-            try {
-                System.out.println(System.getProperty("user.dir"));
-                InputStream in = getClass().getResourceAsStream("input_v2.json");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                //BufferedReader reader = new BufferedReader(new FileReader("input_v2.json"));
-                // read + parse file and convert to JSONObject
-                org.json.JSONObject inputObject = (org.json.JSONObject) parser.parse(reader);
-                //JSONObject inputObject = (JSONObject) parser.parse(
-                        //new FileReader(getClass().getResource("input_v2.json").getPath()));
+            System.out.println(System.getProperty("user.dir"));
+            InputStream in = getClass().getResourceAsStream("raw_data/input_v2.json");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            //BufferedReader reader = new BufferedReader(new FileReader("input_v2.json"));
+            // read + parse file and convert to JSONObject
+//                org.json.JSONObject inputObject = (org.json.JSONObject) parser.parse(reader);
+            tokener = new JSONTokener(in);
+            org.json.JSONObject inputObject = new org.json.JSONObject(tokener);
 
-                //method to generate a List of PDRoute objects
-                generatePDRouteList(inputObject);
+            //JSONObject inputObject = (JSONObject) parser.parse(
+            //new FileReader(getClass().getResource("input_v2.json").getPath()));
 
-                int placeID = getPdRouteList().size()*2;
+            //method to generate a List of PDRoute objects
+            generatePDRouteList(inputObject);
 
-                //method to generate a List of VehicleDefiniton objects
-                generateVehicleDefinitionList(placeID, inputObject);
+            int placeID = getPdRouteList().size()*2;
 
-            } catch (ParseException | IOException e) {
-                e.printStackTrace();
-            }
+            //method to generate a List of VehicleDefiniton objects
+            generateVehicleDefinitionList(placeID, inputObject);
+
         }
     }
 
@@ -75,9 +78,9 @@ public class JSONReader {
         for (Object o : services){
 
             JSONObject serviceObjects = (JSONObject) o;
-
-            String jobID = (String) serviceObjects.get("jobID");
-            int capacity = (int) (long) serviceObjects.get("capacity");
+//            System.out.println(o);
+            String jobID = (String) serviceObjects.get("jobid");
+            int capacity = (int)serviceObjects.get("capacity");
 
             //read coordinates and adress data of pickup location; initialize Place objects
             org.json.JSONObject pickupLocation = (org.json.JSONObject) serviceObjects.get("pickup");
@@ -106,7 +109,7 @@ public class JSONReader {
             JSONObject vehicleObjects = (JSONObject) o;
 
             String uniqueName = (String) vehicleObjects.get("id");
-            int capacity = (int) (long) vehicleObjects.get("capacity");
+            int capacity = (int)vehicleObjects.get("capacity");
 
             org.json.JSONObject vehicleLocation = (org.json.JSONObject) vehicleObjects.get("startlocation");
             startLocation = generatePlace(vehicleLocation, placeID);
@@ -126,9 +129,10 @@ public class JSONReader {
         double lon = (Double) location.get("lon");
         String city = (String) location.get("city");
         String street = (String) location.get("street");
-        int houseNo = (int) (long) location.get("houseNo");
-        int zip = (int) (long) location.get("zip");
+        int houseNo = (int)location.get("houseNo");
+        int zip = (int)location.get("zip");
+        TimeWindow timeWindow = new TimeWindow((double)location.get("start"), (double)location.get("end"));
 
-        return new Place(lat, lon, city, street,  houseNo, zip, placeID);
+        return new Place(lat, lon, city, street,  houseNo, zip, placeID, timeWindow);
     }
 }

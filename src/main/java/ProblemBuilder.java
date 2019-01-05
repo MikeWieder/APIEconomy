@@ -26,6 +26,8 @@ public class ProblemBuilder {
     private List<PDRoute> routes;
     private List<VehicleDefinition> vehicles;
     private Map<PDRoute,InstructionList> routeInstructionsMap;
+    private double pickupServiceTime = 2;
+    private double deliveryServiceTime = 1;
 
     /**
      *
@@ -62,6 +64,9 @@ public class ProblemBuilder {
 
         List<VehicleDefinition> vehicles = getVehicles();
 
+        System.out.println("-------------------------VEHICLES----------------------");
+        System.out.println(vehicles.toString());
+
         for(VehicleDefinition vehicle : vehicles) {
             //startLocation = Location.Builder.newInstance().setId(vehicle.getName()).setIndex(vehicle.getId()).build();
             //for(Shipment shipment : shipments) {
@@ -74,6 +79,7 @@ public class ProblemBuilder {
 //            System.out.println(vehicle.getName());
             builder.addVehicle(buildVehicle(vehicle,false));
         }
+        System.out.println(builder.getAddedVehicles().toString());
         //builder.addVehicle(buildVehicle(startLocation, "vehicle1",4, false));
         //builder.addVehicle(buildVehicle(startLocation, "vehicle2", 4, false));
 
@@ -107,7 +113,9 @@ public class ProblemBuilder {
             //TimeWindow tw = new TimeWindow(0,20);
             Shipment shipment = Shipment.Builder.newInstance(route.toString()).addSizeDimension(0,route.getCapacity()).setPickupLocation(Location.Builder.newInstance()
                     .setIndex(route.getPickup().getLocID()).setId(Integer.toString(route.getPickup().getLocID())).build())
-                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(route.getDelivery().getLocID()).setId(Integer.toString(route.getDelivery().getLocID())).build()).setName(route.getJobName()).build();
+                    .setDeliveryLocation(Location.Builder.newInstance().setIndex(route.getDelivery().getLocID()).setId(Integer.toString(route.getDelivery().getLocID())).build())
+                    .setDeliveryTimeWindow(route.getDelivery().getTimeWindow()).setPickupTimeWindow(route.getPickup().getTimeWindow()).setName(route.getJobName())
+                    .setPickupServiceTime(pickupServiceTime).setDeliveryServiceTime(deliveryServiceTime).build();
 
             shipments.add(shipment);
         }
