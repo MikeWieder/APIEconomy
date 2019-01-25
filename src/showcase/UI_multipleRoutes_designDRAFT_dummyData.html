@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UltimateRouting</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-flat.css">
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+	  #mapcontainer {
+		height: 100%;
+	  }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+</head>
+<body>
+<div class="w3-container w3-flat-turquoise">
+    <h1>ULTIMATE ROUTING</h1>
+</div>
+
+<div id = "InpOutBox" class="w3-row-padding w3-container w3-border">
+    <div class="w3-third">
+
+        <div class="w3-panel w3-border">
+            <h3>Request current inquiries from server.</h3>
+            <p><button id="btninq" class="w3-button w3-purple w3-hover-purple w3-round-large">GET INQUIRIES...</button></p>
+
+            <div class="w3-panel w3-light-grey">
+                <h5>Additional options</h5>
+                <input class="w3-check" type="checkbox" >
+                <label>Start location = end location</label>
+
+                <input class="w3-check" type="checkbox">
+                <label>Include gas station[POI] (reach per vehicle has to be entered)</label>
+
+                <input class="w3-check" type="checkbox" >
+                <label>Define rest intervall</label>
+            </div>
+        </div>
+
+        <div class="w3-panel w3-dark-grey">
+            <h3>Send routing request for current inquiries.</h3>
+            <p><button id ="btnreq" class="w3-button w3-purple w3-hover-purple w3-round-large">SEND REQUEST...</button></p>
+        </div>
+    </div>
+
+    <div class="w3-twothird">
+        <h3>TRIPS PER VEHICLE</h3>
+        <div class="w3-left-align w3-wide w3-container w3-border"><p id="routeOUTPUT" >Resulting Routes go here.</p></div>
+    </div>
+
+</div>
+
+<div class="w3-panel w3-flat-turquoise">
+    <h2>ROUTE VISUALIZATION</h2>
+</div>
+
+<div class="w3-container" id="mapcontainer">
+    <div class="w3-left-align w3-wide w3-container w3-border w3-quarter"><p id="directionsOUTPUT" >Resulting Directions go here.</p></div>
+    <div class="w3-threequarter w3-border" id="map" ></div>
+</div>
+
+<script>
+      function initMap() {
+		var markerArray = [];
+		var countMarker = 0;
+
+		var jsonArray;
+		var requestArray = [];
+
+		// Instantiate a directions service + a renderer
+		var directionsService = new google.maps.DirectionsService;
+
+		// Instantiate an info window to hold step text.
+        var stepDisplay = new google.maps.InfoWindow;
+
+		// Instantiate map
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 48.775544, lng: 9.182360},
+          zoom: 7,
+		  mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+		var onButtonClicked = function() {
+		  // First, remove any existing markers + text from the map.
+          for (var i = 0; i < markerArray.length; i++) {
+			markerArray[i].setMap(null);
+		  }
+		  document.getElementById('routeOUTPUT').innerHTML="";
+		  document.getElementById('directionsOUTPUT').innerHTML="";
+		  /*
+		  -- API-Request -- http Request an API
+		  */
+		  //jsonArray = APIrequest();
+		  APIrequest(requestArray, directionsService, markerArray, countMarker, stepDisplay, map);
+		  //console.log('jsonArray: ' + jsonArray);
+		  /*
+		  Funktionsaufruf: Einlesen und Verarbeiten der "API-Response" ->aktuell: fiktives JSON (String, s.u.)
+		  */
+		  //readJSON (jsonArray, requestArray);
+		  //calculateDirections(requestArray, directionsService, markerArray, countMarker, stepDisplay, map)
+		  };
+        document.getElementById('btnreq').addEventListener('click', onButtonClicked);
+		}
+		/*
+		  -- API-Request -- http Request an API
+		  */
+		function APIrequest (requestArray, directionsService, markerArray, countMarker, stepDisplay, map){
+			var inputFile = readInputFile();
+			console.log(inputFile);
+			console.log('Starte API-Request...');
+
+			var xmlhttp = new XMLHttpRequest();
+			var responseAPI = "";
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					//var responseAPI = JSON.parse(xmlhttp.responseText);
+					responseAPI = xmlhttp.responseText;
+					console.log('Status: ' + xmlhttp.status + '. JSON-Response: ');
+					console.log(responseAPI);
+					responseAPI = JSON.parse(xmlhttp.responseText);
+					generateRequests(responseAPI,requestArray);
+					calculateDirections(requestArray, directionsService, markerArray, countMarker, stepDisplay, map)
+				}else{
+					console.log('..etwas ist schief gegangen ..?');
+				}
+			};
+			xmlhttp.open("POST", "http://134.103.195.110:30399/OptimizedRoute", false); //"false" to make synchronous call - funktioniert nicht --> CORS-FEHLER!
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			xmlhttp.send(inputFile); //specify data to be send ..?
+
+			//return responseAPI;
+		}
+		function readInputFile (){
+			var input = new XMLHttpRequest();
+			var allText = "";
+
+			input.onreadystatechange = function (){
+				if(input.readyState === 4) {
+					if(input.status === 200 || input.status == 0){
+						//allText = JSON.parse(input.responseText);
+						allText = input.responseText;
+					}
+				}
+			}
+			//input.open("GET", "file:///C:/Users/Marina/Dropbox/Mymy/Sem2_JP/showcase/jsons/API%20request/Request0.json",false); // laptop marina
+			//input.open("GET", "file:///D:/Dropbox/Mymy/Sem2_JP/showcase/jsons/API%20request/Request0.json", false); // PC marina
+			input.send(null);
+			return allText;
+		}
+		/*
+		  Einlesen und Verarbeiten der "API-Response" ->aktuell: fiktives JSON (String, s.u.)
+		*/
+		function readJSON (jsonArray, requestArray){
+			//jsonArray = {"vehicleID1": ["47.995733, 7.853466", "48.679884, 8.999376", "48.792177, 9.166188", "48.890879, 9.182318", "49.146638, 9.223545"], "vehicleID2": ["47.783580, 9.614629", "48.093755, 9.792246", "48.481847, 9.187074", "48.642140, 9.470457", "48.797264, 9.795875"]}
+			console.log(jsonArray);
+			generateRequests(jsonArray, requestArray);
+		}
+		function generateRequests(jsonArray, requestArray){
+				jsonArray = {"vehicleID1": ["47.995733, 7.853466", "48.679884, 8.999376", "48.792177, 9.166188", "48.890879, 9.182318", "49.146638, 9.223545"], "vehicleID2": ["47.783580, 9.614629", "48.093755, 9.792246", "48.481847, 9.187074", "48.642140, 9.470457", "48.797264, 9.795875"]}
+				console.log("generateRequests() started");
+				console.log(jsonArray);
+				for(var route in jsonArray){
+					//var lastpoint;
+					var wpts = [];
+					var start, end;
+					var data = jsonArray[route]
+
+					for (var waypoint = 0; waypoint < data.length; waypoint++){
+						//if(data[waypoint] === lastpoint){continue;}
+						//lastpoint = data[waypoint];
+						wpts.push({
+							location: data[waypoint]
+						});
+					}
+					start = (wpts.shift()).location;
+					console.log("wpts länge nach shift: " +wpts.length);
+					end = (wpts.pop()).location;
+					console.log("wpts länge nach pop: " +wpts.length);
+					//if(end === undefined){end = start;}
+					//end = end.location;
+					var request = {
+						origin: start,
+						destination: end,
+						waypoints: wpts,
+						travelMode: google.maps.TravelMode.DRIVING
+					};
+					requestArray.push({"route": route, "request": request});
+					console.log(requestArray[0].request);
+				}
+		}
+	  /*
+		--ROUTEN-Berechnung und RENDERING--
+		Um mehrere Routen abzubilden muss 1 Renderer / Route erzeugt werden.
+		Funktionalistät muss daher entkoppelt werden.
+		(1) calculateDirections() --> innerfunction call (2) renderDirections()
+		(Berechnung durch Übergabe von Origin, Destination und Waypoints and DirectionsService-Instanz
+		Rendering durch Übergabe der Response an DirectionsRenderer-Instanz)
+		+ Aufruf der MARKER-FUNKTIONALITÄT
+		*/
+	  function calculateDirections(requestArray, directionsService, markerArray, countMarker, stepDisplay, map){
+			console.log("calculateDirections() started");
+			var i = 0;
+			function submitRequest(){
+				directionsService.route(requestArray[i].request, directionResult);
+				countMarker = markerArray.length+1;
+			}
+			function directionResult(result, status){
+				if(status === 'OK'){
+					renderDirections(result,map);
+					showSteps(result, markerArray, countMarker, stepDisplay, map);
+				}else{
+					window.alert('Directions request failed due to ' + status);
+				}
+				nextRequest();
+			}
+			function nextRequest(){
+				i++;
+				if(i >= requestArray.length){
+					return;
+				}
+				submitRequest();
+			}
+			submitRequest();
+	  }
+	  function renderDirections(result, map) {
+		var directionsRenderer = new google.maps.DirectionsRenderer;
+        directionsRenderer.setMap(map);
+        directionsRenderer.setDirections(result);
+      }
+		/*
+		--MARKER & ROUTENSEGMENT FUNKTIONALITÄT--
+		Jedes Leg der Route als Routensegment in Output-Feld ausgeben
+		Direction-Steps auslesen; Marker in Map einfügen und Step-Text anhängen (onClick)
+		*/
+	  function showSteps(directionResult, markerArray, countMarker, stepDisplay, map) {
+        // For each step, place a marker; add text to markers' infowindow --> call function attachInstructionText
+        // + attach marker to array so we can keep track of it and remove it when calculating new routes.
+
+		var summaryPanel = document.getElementById('routeOUTPUT');
+		var directionsPanel = document.getElementById('directionsOUTPUT');
+		//summaryPanel.innerHTML="";
+		var distanceSum = 0;
+		var routeSegment = 0;
+
+        for (var j = 0; j < directionResult.routes[0].legs.length; j++){
+			var myRoute = directionResult.routes[0].legs[j];
+			routeSegment = j + 1;
+
+            summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+            summaryPanel.innerHTML += myRoute.start_address + ' to ';
+            summaryPanel.innerHTML += myRoute.end_address + '<br>';
+            summaryPanel.innerHTML += myRoute.distance.text + '<br><br>';
+
+			distanceSum = distanceSum + myRoute.distance.value;
+
+			directionsPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+
+			for (var i = 0; i < myRoute.steps.length; i++) {
+			  var marker = markerArray[countMarker] = markerArray[countMarker] || new google.maps.Marker({
+				icon: {
+					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+					fillColor: "blue",
+					fillOpacity: 0.4,
+					strokeColor: 'black',
+					strokeWeight: 2,
+					scale: 2
+				}
+			  });
+			  marker.setMap(map);
+			  marker.setPosition(myRoute.steps[i].start_location);
+			  directionsPanel.innerHTML += i+1 +'. '+ myRoute.steps[i].instructions + '<br>';
+			  attachInstructionText(
+				  stepDisplay, marker, myRoute.steps[i].instructions, map);
+			  countMarker++;
+			  console.log("Markeranzahl? -> countMarker= "+countMarker+" MarkerArray-Länge: "+markerArray.length);
+			}
+		}
+		summaryPanel.innerHTML += '<b>Tour Total: ' + distanceSum/1000 + ' km<br><br>';
+		directionsPanel.innerHTML += '<br><br>'
+		return countMarker;
+      }
+      function attachInstructionText(stepDisplay, marker, text, map) {
+        google.maps.event.addListener(marker, 'click', function() {
+          // Open an info window when marker is clicked on; containing text of this step.
+          stepDisplay.setContent(text);
+          stepDisplay.open(map, marker);
+        });
+      }
+    </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8WacIHF4tru6XB0H6NtcXw_eh-38al4&callback=initMap"
+        async defer></script>
+</body>
+</html>

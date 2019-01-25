@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>UltimateRouting</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-flat.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-win8.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-metro.css">
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+	  #mapcontainer {
+		height: 100%;
+	  }
+	  #routeOUTPUT {
+		height: 400px;
+		overflow: auto;
+	  }
+	  #directionsOUTPUT{
+		height: 600px;
+		overflow: auto;
+	  }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+</head>
+<body>
+<div class="w3-container w3-flat-belize-hole">
+    <h1>SmartCab - Routing Monitor</h1>
+</div>
+
+<div id = "InpOutBox" class="w3-row-padding w3-container w3-border">
+    <div class="w3-third">
+
+        <div class="w3-panel w3-border">
+            <h4>Request current inquiries driver locations from server.</h3>
+                <p><button id="btninq" class="w3-button w3-win8-cobalt w3-flat-midnight-blue w3-round-large w3-hover-blue">GET INQUIRIES / LOCATIONS ...</button></p>
+
+                <div class="w3-panel w3-light-grey">
+                    <h5>Additional options</h5>
+                    <input class="w3-check" type="checkbox" >
+                    <label>Start location = end location</label>
+
+                    <input class="w3-check" type="checkbox">
+                    <label>Include custom time windows</label>
+
+                    <input class="w3-check" type="checkbox" >
+                    <label>Include custom driver rest intervall</label>
+                </div>
+        </div>
+
+        <div class="w3-panel w3-dark-grey">
+            <h4>Send routing request for current inquiries.</h4>
+            <p><button id ="btnreq" class="w3-button w3-flat-orange w3-hover-yellow w3-round-large">SEND REQUEST to RoutingAPI...</button></p>
+        </div>
+
+        <div class="w3-panel w3-border">
+            <h4>Send separate routes to drivers' navigation devices.</h3>
+                <p><button id="btninq" class="w3-button w3-win8-cobalt w3-hover-blue w3-round-large">SEND ROUTES ...</button></p>
+        </div>
+    </div>
+
+    <div class="w3-twothird">
+        <h3>TRIPS PER VEHICLE</h3>
+        <div class="w3-left-align w3-wide w3-container w3-border"><p id="routeOUTPUT" >Resulting Routes go here.</p></div>
+    </div>
+
+</div>
+
+<div class="w3-panel w3-flat-belize-hole">
+    <h2>ROUTE VISUALIZATION</h2>
+</div>
+
+<div class="w3-container" id="mapcontainer">
+    <div class="w3-left-align w3-wide w3-container w3-border w3-quarter"><p id="directionsOUTPUT" >Resulting Directions go here.</p></div>
+    <div class="w3-threequarter w3-border" id="map" ></div>
+</div>
+
+<script>
+      function initMap() {
+		var markerArray = [];
+		var countMarker = 0;
+
+		var jsonArray;
+		var requestArray = [];
+
+		//var colourArray = ['blue', 'blue', 'fuchsia', 'fuchsia', 'aqua', 'aqua', 'aqua', 'aqua', 'aqua', 'aqua', 'olive', 'olive', 'olive', 'orange', 'red', 'green', 'silver', 'lime', 'navy'];
+		var colourArray = ['silver', 'blue', 'fuchsia', 'aqua', 'olive', 'orange', 'red', 'green', 'silver', 'navy'];
+		// Instantiate a directions service + a renderer
+		var directionsService = new google.maps.DirectionsService;
+
+		// Instantiate an info window to hold step text.
+        var stepDisplay = new google.maps.InfoWindow;
+
+		// Instantiate map
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 48.775544, lng: 9.182360},
+          zoom: 7,
+		  mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+		var onButtonClicked = function() {
+		  // First, remove any existing markers + text from the map.
+          for (var i = 0; i < markerArray.length; i++) {
+			markerArray[i].setMap(null);
+		  }
+		  document.getElementById('routeOUTPUT').innerHTML="";
+		  document.getElementById('directionsOUTPUT').innerHTML="";
+		  /*
+		  -- API-Request -- http Request an API --
+		  -- Verarbeitung des Response --
+		  -- ROUTE-CALCULATION & RENDERING --
+		  */
+		  APIrequest(colourArray, requestArray, directionsService, markerArray, countMarker, stepDisplay, map);
+
+		  };
+        document.getElementById('btnreq').addEventListener('click', onButtonClicked);
+		}
+		/*
+		  -- API-Request -- http Request an API
+		  */
+		function APIrequest (colourArray, requestArray, directionsService, markerArray, countMarker, stepDisplay, map){
+			console.log("--- PROCESSING REQUEST ---");
+			var inputFile = readInputFile();
+			console.log("InputFile: "+ inputFile);
+			console.log('Start API-Request...');
+
+			var xmlhttp = new XMLHttpRequest();
+			var responseAPI = "";
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					responseAPI = xmlhttp.responseText;
+					console.log('Status: ' + xmlhttp.status + '. JSON-Response: ');
+					console.log(responseAPI);
+					responseAPI = JSON.parse(xmlhttp.responseText);
+					/*
+					Verarbeiten der "API-Response" -> Response in RequestArray überführen.
+					*/
+					generateRequests(responseAPI,requestArray);
+					/*
+					--ROUTE-CALCULATION & RENDERING--
+					+ MARKER: calculation & rendering
+					*/
+					calculateDirections(colourArray, requestArray, directionsService, markerArray, countMarker, stepDisplay, map)
+				}else{
+					console.log('........');
+				}
+			};
+			xmlhttp.open("POST", "http://134.103.195.110:30399/OptimizedRoute", false); //"false" to make synchronous call
+			xmlhttp.setRequestHeader("Content-Type", "application/json");
+			xmlhttp.send(inputFile); //specify data to be send ..?
+		}
+		function readInputFile (){
+			console.log("Read InputFile ...");
+			var input = new XMLHttpRequest();
+			var allText = "";
+
+			input.onreadystatechange = function (){
+				if(input.readyState === 4) {
+					if(input.status === 200 || input.status == 0){
+						allText = input.responseText;
+					}
+				}
+			}
+			input.open("GET", "file:///D:/Dropbox/Mymy/Sem2_JP/showcase/jsons/API%20request/Request_showcase.json", false); // PC marina | Request_showcase
+			//input.open("GET", "file:///C:/Users/Marina/Dropbox/Mymy/Sem2_JP/showcase/jsons/API%20request/Request_showcase.json", false); // Laptop marina | Request_showcase
+			//input.open("GET", "file:///C:/Users/mike-/Dropbox/Jahresprojekt%20API-Economy/showcase/Request_showcase.json", false); // Laptop Mike | Request_showcase
+
+			input.send(null);
+			return allText;
+		}
+		/*
+		  Verarbeiten der "API-Response"
+		*/
+		function generateRequests(jsonArray, requestArray){
+			console.log("generateRequests() started ...");
+			console.log("jsonArray: ");
+			console.log(jsonArray);
+			for(var route in jsonArray){
+				//var lastpoint;
+				var wpts = [];
+				var start, end;
+				var data = jsonArray[route]
+
+				for (var waypoint = 0; waypoint < data.length; waypoint++){
+					wpts.push({
+						location: data[waypoint]
+					});
+				}
+				console.log("wpts: ");
+				console.log(wpts);
+
+				if(wpts.length > 10){
+						wptsCount = 0;
+
+						while(wptsCount <= wpts.length){
+							var wptsPart = [];
+							console.log("wptsCount: ");
+							console.log(wptsCount);
+
+							var diff = wpts.length-wptsCount;
+							console.log("Diff: "+diff);
+
+							if (diff <= 10){
+								for(var i = 0 + wptsCount; i <= wpts.length-1	; i++){
+									console.log("Value i: "+i);
+									wptsPart.push({
+									location: wpts[i].location
+									});
+								}
+								wptsCount = wptsCount + i;
+							}else if(diff == 11 || 12 ){
+								for(var i = 0 + wptsCount; i <= 7+wptsCount	; i++){
+									console.log("Value i: "+i);
+									wptsPart.push({
+									location: wpts[i].location
+									});
+								}
+								wptsCount = wptsCount + 7;
+							}else{
+								for(var i = 0 + wptsCount; i <= 9+wptsCount; i++){
+									wptsPart.push({
+									location: wpts[i].location
+									});
+								}
+								wptsCount = wptsCount + 9;
+							}
+							start = (wptsPart.shift()).location;
+							console.log("wptsPart länge nach shift: " +wptsPart.length);
+							end = (wptsPart.pop()).location;
+							console.log("wptsPart länge nach pop: " +wptsPart.length);
+							var request = {
+								origin: start,
+								destination: end,
+								waypoints: wptsPart,
+								travelMode: google.maps.TravelMode.DRIVING
+							};
+							requestArray.push({"route": route, "request": request});
+							console.log("requestArray: ");
+							console.log(requestArray);
+						}
+				}else{
+					start = (wpts.shift()).location;
+					console.log("wpts länge nach shift: " +wpts.length);
+					end = (wpts.pop()).location;
+					console.log("wpts länge nach pop: " +wpts.length);
+					var request = {
+						origin: start,
+						destination: end,
+						waypoints: wpts,
+						travelMode: google.maps.TravelMode.DRIVING
+					};
+					requestArray.push({"route": route, "request": request});
+					console.log("requestArray: ");
+					console.log(requestArray);
+				}
+			}
+		}
+	  /*
+		--ROUTEN-Berechnung und RENDERING--
+		Um mehrere Routen abzubilden muss 1 Renderer / Route erzeugt werden.
+		Funktionalistät muss daher entkoppelt werden.
+		(1) calculateDirections() --> innerfunction call (2) renderDirections()
+		(Berechnung durch Übergabe von Origin, Destination und Waypoints and DirectionsService-Instanz
+		Rendering durch Übergabe der Response an DirectionsRenderer-Instanz)
+		+ Aufruf der MARKER-FUNKTIONALITÄT
+		*/
+	  function calculateDirections(colourArray, requestArray, directionsService, markerArray, countMarker, stepDisplay, map){
+			console.log("calculateDirections() started...");
+			var i = 0;
+			var colorArrayCount = requestArray[i].route;//0;
+			function submitRequest(){
+				directionsService.route(requestArray[i].request, directionResult);
+				countMarker = markerArray.length+1;
+			}
+			function directionResult(result, status){
+				if(status === 'OK'){
+					var j = i+1;
+					renderDirections(colourArray, colorArrayCount, result, map);
+					document.getElementById('routeOUTPUT').innerHTML += '<b>ROUTE '+ requestArray[i].route + '.' + j + ' (color: ' + colourArray[colorArrayCount] + ')' + '</b><br><br>';
+					document.getElementById('directionsOUTPUT').innerHTML += '<b>ROUTE '+ requestArray[i].route + '.' + j + ' (color: ' + colourArray[colorArrayCount] + ')' + '</b><br><br>';
+					showSteps(result, markerArray, countMarker, stepDisplay, map);
+				}else{
+					window.alert('Directions request failed due to ' + status);
+				}
+				nextRequest();
+			}
+			function nextRequest(){
+				i++;
+				if(i >= requestArray.length){
+					return;
+				}
+				colorArrayCount = requestArray[i].route;//++;
+				submitRequest();
+			}
+			submitRequest();
+	  }
+	  function renderDirections(colourArray, colorArrayCount, result, map) {
+		var directionsRenderer = new google.maps.DirectionsRenderer;
+        directionsRenderer.setMap(map);
+		directionsRenderer.setOptions({
+			polylineOptions: {
+                strokeWeight: 4,
+                strokeOpacity: 0.8,
+                strokeColor: colourArray[colorArrayCount]
+            }
+		});
+        directionsRenderer.setDirections(result);
+      }
+		/*
+		--MARKER & ROUTENSEGMENT FUNKTIONALITÄT--
+		Jedes Leg der Route als Routensegment in Output-Feld ausgeben
+		Direction-Steps auslesen; Marker in Map einfügen und Step-Text anhängen (onClick)
+		*/
+	  function showSteps(directionResult, markerArray, countMarker, stepDisplay, map) {
+        // For each step, place a marker; add text to markers' infowindow --> call function attachInstructionText
+        // + attach marker to array so we can keep track of it and remove it when calculating new routes.
+
+		var summaryPanel = document.getElementById('routeOUTPUT');
+		var directionsPanel = document.getElementById('directionsOUTPUT');
+		//summaryPanel.innerHTML="";
+		var distanceSum = 0;
+		var routeSegment = 0;
+
+        for (var j = 0; j < directionResult.routes[0].legs.length; j++){
+			var myRoute = directionResult.routes[0].legs[j];
+			routeSegment = j + 1;
+
+            summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+            summaryPanel.innerHTML += myRoute.start_address + ' to ';
+            summaryPanel.innerHTML += myRoute.end_address + '<br>';
+            summaryPanel.innerHTML += myRoute.distance.text + '<br><br>';
+
+			distanceSum = distanceSum + myRoute.distance.value;
+
+			directionsPanel.innerHTML += '<b>Route Segment: ' + routeSegment + '</b><br>';
+
+			for (var i = 0; i < myRoute.steps.length; i++) {
+			  var marker = markerArray[countMarker] = markerArray[countMarker] || new google.maps.Marker({
+				icon: {
+					path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+					fillColor: "blue",
+					fillOpacity: 0.4,
+					strokeColor: 'black',
+					strokeWeight: 2,
+					scale: 2
+				}
+			  });
+			  marker.setMap(map);
+			  marker.setPosition(myRoute.steps[i].start_location);
+			  directionsPanel.innerHTML += i+1 +'. '+ myRoute.steps[i].instructions + '<br>';
+			  attachInstructionText(
+				  stepDisplay, marker, myRoute.steps[i].instructions, map);
+			  countMarker++;
+			  console.log("Markeranzahl? -> countMarker= "+countMarker+" MarkerArray-Länge: "+markerArray.length);
+			}
+		}
+		summaryPanel.innerHTML += '<b>Tour Total: ' + distanceSum/1000 + ' km<br><br>';
+		directionsPanel.innerHTML += '<br><br>'
+		return countMarker;
+      }
+      function attachInstructionText(stepDisplay, marker, text, map) {
+        google.maps.event.addListener(marker, 'click', function() {
+          // Open an info window when marker is clicked on; containing text of this step.
+          stepDisplay.setContent(text);
+          stepDisplay.open(map, marker);
+        });
+      }
+    </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8WacIHF4tru6XB0H6NtcXw_eh-38al4&callback=initMap"
+        async defer></script>
+</body>
+</html>
