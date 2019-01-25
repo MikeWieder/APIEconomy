@@ -34,11 +34,11 @@ public class Main {
     public static void main(String args[]) {
 
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("10.244.2.27");
-        factory.setPort(5672);
+//        factory.setHost("10.244.2.27");
+//        factory.setPort(5672);
 
-        //factory.setHost("134.103.195.110");
-        //factory.setPort(31834);
+        factory.setHost("134.103.195.110");
+        factory.setPort(31834);
 
         Connection connection = null;
         try {
@@ -46,7 +46,7 @@ public class Main {
             final Channel channel = connection.createChannel();
 
             channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
-            channel.queuePurge(RPC_QUEUE_NAME);
+            //channel.queuePurge(RPC_QUEUE_NAME);
 
             channel.basicQos(1);
 
@@ -177,6 +177,7 @@ public class Main {
         }
         JSONBuilder jsonBuilder = new JSONBuilder();
         String jsonString =jsonBuilder.buildGeoJSON(solution,routes,vehilces);
+        jsonString=jsonBuilder.buildShowCaseJSON(solution,routes,vehilces);
 //        try {
 //            File file = new File(".." + File.separator + "output" + File.separator + "output.json");
 //            file.createNewFile();

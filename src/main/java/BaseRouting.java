@@ -36,13 +36,13 @@ public class BaseRouting {
 }
 
     public void setOutput(String outputLocation) {
-        String path = "results";
+        //String path = "results";
         try {
             //path = getClass().getResource("/results/").getPath();
         } catch(Exception e) {
             e.printStackTrace();
         }
-        //String path = "../results";
+        String path = "../results";
         hopper.setGraphHopperLocation(path);
         //hopper.setGraphHopperLocation(outputLocation);
     }
