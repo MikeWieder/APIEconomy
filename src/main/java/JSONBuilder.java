@@ -133,4 +133,41 @@ public class JSONBuilder {
         return outerObject.toString(1);
     }
 
+    public String buildShowCaseJSON(VehicleRoutingProblemSolution solution, List<PDRoute> routes, List<VehicleDefinition> vehicles) {
+
+        JSONObject obj = new JSONObject();
+
+        for(VehicleRoute vr : solution.getRoutes()) {
+            JSONArray vehicleRoute = new JSONArray();
+            String vehicleid = vr.getVehicle().getStartLocation().getId();
+            for(VehicleDefinition vehicle : vehicles) {
+                System.out.println(vehicle.getStartLocation().getLocID());
+                System.out.println(vehicleid);
+                if(Integer.toString(vehicle.getStartLocation().getLocID()).equals(vehicleid)) {
+                    System.out.println("here");
+                    vehicleRoute.put(""+vehicle.getStartLocation().getLat()+", "+vehicle.getStartLocation().getLon()+"");
+                }
+            }
+
+            for(TourActivity activity : vr.getActivities()) {
+                int index = activity.getLocation().getIndex();
+                for(PDRoute route : routes) {
+                    if(route.getPickup().getLocID() == index) {
+                        vehicleRoute.put(""+route.getPickup().getLat()+", "+route.getPickup().getLon()+"");
+                    }
+                    if(route.getDelivery().getLocID() == index) {
+                        vehicleRoute.put(""+route.getDelivery().getLat()+", "+route.getDelivery().getLon()+"");
+                    }
+                }
+            }
+            obj.put(vr.getVehicle().getId(),vehicleRoute);
+
+        }
+
+
+
+
+        return obj.toString();
+    }
+
 }
