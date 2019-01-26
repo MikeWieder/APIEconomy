@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+  creationTimestamp: 2018-11-13T16:21:33Z
+  generation: 2
+  labels:
+    app: rabbitmq
+  name: rabbitmq-deployment
+  namespace: default
+  resourceVersion: "11595156"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/rabbitmq-deployment
+  uid: 2f5ea721-e760-11e8-b1de-fa163e0b311a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: rabbitmq
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - image: rabbitmq:latest
+        imagePullPolicy: Always
+        name: rabbitmq
+        ports:
+        - containerPort: 5672
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      - image: kbudde/rabbitmq-exporter
+        imagePullPolicy: Always
+        name: rabbitmq-exporter
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: 2018-11-13T16:21:33Z
+    lastUpdateTime: 2018-12-12T15:17:54Z
+    message: ReplicaSet "rabbitmq-deployment-5d67b9f976" has successfully progressed.

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: 2018-12-12T15:32:01Z
+  labels:
+    app: rabbitmq
+  name: management-svc
+  namespace: default
+  resourceVersion: "6618647"
+  selfLink: /api/v1/namespaces/default/services/management-svc
+  uid: 120f357d-fe23-11e8-b1de-fa163e0b311a
+spec:
+  clusterIP: 10.99.54.120
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: port-1
+    nodePort: 30612
+    port: 5672
+    protocol: TCP
+    targetPort: 5672
+  - name: port-2
+    nodePort: 32346
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  - name: port-3
+    nodePort: 32352
+    port: 15672
+    protocol: TCP
+    targetPort: 15672
+  selector:
+    app: rabbitmq
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
