@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apicontainer-deployment
+  labels:
+    app: apicontainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apicontainer
+  template:
+    metadata:
+      labels:
+        app: apicontainer
+    spec:
+      containers:
+      - name: apicontainer
+        image: mikewieder/apicontainer:latest
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 8080
+          name: http2
+        - containerPort: 5672
+          name: rabbitmq

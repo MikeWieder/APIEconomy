@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcontainer-deployment
+  labels:
+    app: appcontainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appcontainer
+  template:
+    metadata:
+      labels:
+        app: appcontainer
+    spec:
+      containers:
+      - name: appcontainer
+        image: mikewieder/appcontainer:latest
+        ports:
+        - containerPort: 5672
